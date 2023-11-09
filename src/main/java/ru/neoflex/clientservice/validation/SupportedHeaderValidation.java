@@ -1,4 +1,4 @@
-package ru.neoflex.clientservice.utils;
+package ru.neoflex.clientservice.validation;
 
 import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
 

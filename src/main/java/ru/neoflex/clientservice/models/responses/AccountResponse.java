@@ -1,10 +1,7 @@
 package ru.neoflex.clientservice.models.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -12,6 +9,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @ToString
+@EqualsAndHashCode
 public class AccountResponse {
 
     @JsonProperty(value = "id")

@@ -10,7 +10,7 @@ import ru.neoflex.clientservice.models.entities.Account;
 import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
 import ru.neoflex.clientservice.models.responses.AccountResponse;
 import ru.neoflex.clientservice.repositories.AccountRepository;
-import ru.neoflex.clientservice.utils.SupportedHeaderValidation;
+import ru.neoflex.clientservice.validation.SupportedHeaderValidation;
 
 import java.util.List;
 

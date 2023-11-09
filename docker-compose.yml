@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   postgresql:
-    container_name: postgres
+    container_name: client-postgres
     image: postgres:15
     environment:
       - POSTGRES_USER=admin
@@ -9,8 +9,17 @@ services:
       - POSTGRES_DB=account_db
     volumes:
       - postgres:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  service:
+    depends_on:
+      - postgresql
+    build: .
+    environment:
+      - spring_datasource_url=jdbc:postgresql://postgresql:5432/account_db
     ports:
-      - "5432:5432"
+      - "8080:8080"
     networks:
       - backend
 

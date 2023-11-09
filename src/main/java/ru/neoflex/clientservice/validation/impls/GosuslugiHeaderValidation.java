@@ -1,4 +1,4 @@
-package ru.neoflex.clientservice.utils.impls;
+package ru.neoflex.clientservice.validation.impls;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -6,9 +6,9 @@ import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
-import ru.neoflex.clientservice.utils.SupportedHeaderValidation;
-import ru.neoflex.clientservice.utils.groups.AllConstraintGroup;
-import ru.neoflex.clientservice.utils.groups.GosuslugiConstraintGroup;
+import ru.neoflex.clientservice.validation.SupportedHeaderValidation;
+import ru.neoflex.clientservice.validation.groups.AllConstraintGroup;
+import ru.neoflex.clientservice.validation.groups.GosuslugiConstraintGroup;
 
 import java.util.Set;
 

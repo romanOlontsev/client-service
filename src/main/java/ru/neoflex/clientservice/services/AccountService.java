@@ -47,7 +47,9 @@ public class AccountService {
             throw new BadRequestException("At least one request parameter must be non-null");
         }
         List<Account> foundAccounts = repository.findAccountByParams(lastName, firstName, middleName, phoneNumber, email);
-        return mapper.accountResponseListFromAccountList(foundAccounts);
+        List<AccountResponse> accountResponses = mapper.accountResponseListFromAccountList(foundAccounts);
+        log.info("Accounts={} have been requested", accountResponses);
+        return accountResponses;
     }
 
     private void validateByHeader(String header, AccountCreationRequest request) {

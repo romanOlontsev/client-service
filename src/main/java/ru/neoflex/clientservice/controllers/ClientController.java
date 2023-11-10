@@ -10,7 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
-import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
+import ru.neoflex.clientservice.models.requests.AccountRequest;
 import ru.neoflex.clientservice.models.responses.AccountResponse;
 import ru.neoflex.clientservice.models.responses.ApiErrorResponse;
 
@@ -50,9 +50,9 @@ public interface ClientController {
             @RequestHeader(value = "x-Source")
             String header,
             @Parameter(in = ParameterIn.DEFAULT,
-                    schema = @Schema(implementation = AccountCreationRequest.class))
+                    schema = @Schema(implementation = AccountRequest.class))
             @RequestBody
-            AccountCreationRequest request);
+            AccountRequest request);
 
     @Operation(summary = "Get account by id")
     @ApiResponses(value = {

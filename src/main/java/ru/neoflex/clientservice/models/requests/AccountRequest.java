@@ -17,7 +17,7 @@ import java.time.LocalDate;
 @Builder
 @ToString
 @Validated
-public class AccountCreationRequest {
+public class AccountRequest {
 
     @JsonProperty(value = "bank_id")
     @NotNull(groups = {BankConstraintGroup.class, GosuslugiConstraintGroup.class})

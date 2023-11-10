@@ -6,9 +6,9 @@ Web service for working with customer accounts.
 
 - Java 17
 - Spring Boot
-- PostgreSQL 
-- JPA 
-- Swagger 
+- PostgreSQL
+- JPA
+- Swagger
 - JUnit
 - Mockito
 
@@ -41,7 +41,7 @@ $ docker-compose up
 
 Application will run by default on port `8080`
 
-Configure the port by changing services.service.ports in **docker-compose.yml**. 
+Configure the port by changing services.service.ports in **docker-compose.yml**.
 Port 8080 was used by default so the value is easy to identify and change in the configuration file.
 
 ### API
@@ -53,7 +53,7 @@ The list of endpoints can be viewed via the link: [http://localhost:8080/swagger
 Getting accounts according to parameters.
 
 Params:
-  
+
 `lastname` `firstname` `middlename` `phonenumber` `email`
 
 Response:

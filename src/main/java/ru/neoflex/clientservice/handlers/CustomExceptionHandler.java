@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.neoflex.clientservice.exceptions.BadRequestException;
+import ru.neoflex.clientservice.exceptions.DataAlreadyExistsException;
 import ru.neoflex.clientservice.exceptions.DataNotFoundException;
 import ru.neoflex.clientservice.models.responses.ApiErrorResponse;
 
@@ -44,6 +45,14 @@ public class CustomExceptionHandler {
         String message = e.getMessage();
         log.error(message);
         return getApiErrorResponse(e, "404", message);
+    }
+
+    @ExceptionHandler(DataAlreadyExistsException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public ApiErrorResponse handle(DataAlreadyExistsException e) {
+        String message = e.getMessage();
+        log.error(message);
+        return getApiErrorResponse(e, "409", message);
     }
 
     private ApiErrorResponse getApiErrorResponse(Exception e, String code, String description) {

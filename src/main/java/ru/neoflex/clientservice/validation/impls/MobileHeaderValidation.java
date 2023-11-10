@@ -5,7 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
+import ru.neoflex.clientservice.models.requests.AccountRequest;
 import ru.neoflex.clientservice.validation.SupportedHeaderValidation;
 import ru.neoflex.clientservice.validation.groups.AllConstraintGroup;
 import ru.neoflex.clientservice.validation.groups.MobileConstraintGroup;
@@ -20,9 +20,9 @@ public class MobileHeaderValidation implements SupportedHeaderValidation {
     private final Validator validator;
 
     @Override
-    public AccountCreationRequest check(String header, AccountCreationRequest request) {
+    public AccountRequest check(String header, AccountRequest request) {
         if (header.equals(HEADER_NAME)) {
-            Set<ConstraintViolation<AccountCreationRequest>> violations =
+            Set<ConstraintViolation<AccountRequest>> violations =
                     validator.validate(request, AllConstraintGroup.class, MobileConstraintGroup.class);
             if (!violations.isEmpty()) {
                 throw new ConstraintViolationException(("Error occurred: "), violations);

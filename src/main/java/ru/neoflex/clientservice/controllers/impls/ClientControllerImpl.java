@@ -3,7 +3,7 @@ package ru.neoflex.clientservice.controllers.impls;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import ru.neoflex.clientservice.controllers.ClientController;
-import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
+import ru.neoflex.clientservice.models.requests.AccountRequest;
 import ru.neoflex.clientservice.models.responses.AccountResponse;
 import ru.neoflex.clientservice.services.AccountService;
 
@@ -16,7 +16,7 @@ public class ClientControllerImpl implements ClientController {
     private final AccountService service;
 
     @Override
-    public void accountCreation(String header, AccountCreationRequest request) {
+    public void accountCreation(String header, AccountRequest request) {
         service.addAccountBasedOnHeader(header, request);
     }
 

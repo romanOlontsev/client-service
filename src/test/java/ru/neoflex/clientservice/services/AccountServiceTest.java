@@ -18,7 +18,7 @@ import ru.neoflex.clientservice.exceptions.BadRequestException;
 import ru.neoflex.clientservice.exceptions.DataNotFoundException;
 import ru.neoflex.clientservice.mappers.AccountMapper;
 import ru.neoflex.clientservice.models.entities.Account;
-import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
+import ru.neoflex.clientservice.models.requests.AccountRequest;
 import ru.neoflex.clientservice.models.responses.AccountResponse;
 import ru.neoflex.clientservice.repositories.AccountRepository;
 import ru.neoflex.clientservice.validation.SupportedHeaderValidation;
@@ -53,40 +53,40 @@ class AccountServiceTest {
     @Spy
     private static List<SupportedHeaderValidation> supportedHeaderValidationList;
 
-    private AccountCreationRequest request;
+    private AccountRequest request;
 
     @BeforeAll
     public static void setupValidatorInstance() {
         Validator validator = Validation.buildDefaultValidatorFactory()
                                         .getValidator();
         supportedHeaderValidationList = List.of(new BankHeaderValidation(validator),
-                                                new GosuslugiHeaderValidation(validator),
-                                                new MailHeaderValidation(validator),
-                                                new MobileHeaderValidation(validator));
+                new GosuslugiHeaderValidation(validator),
+                new MailHeaderValidation(validator),
+                new MobileHeaderValidation(validator));
 
     }
 
     @BeforeEach
     void setUp() {
-        request = AccountCreationRequest.builder()
-                                        .bankId(-1L)
-                                        .lastName("test")
-                                        .firstName("test")
-                                        .middleName("test")
-                                        .birthDate(LocalDate.now())
-                                        .birthplace("test")
-                                        .passport("1234 123456")
-                                        .phoneNumber("70001112233")
-                                        .email("test")
-                                        .registrationAddress("test")
-                                        .residentialAddress("test")
-                                        .build();
+        request = AccountRequest.builder()
+                                .bankId(-1L)
+                                .lastName("test")
+                                .firstName("test")
+                                .middleName("test")
+                                .birthDate(LocalDate.now())
+                                .birthplace("test")
+                                .passport("1234 123456")
+                                .phoneNumber("70001112233")
+                                .email("test")
+                                .registrationAddress("test")
+                                .residentialAddress("test")
+                                .build();
     }
 
     @Test
     void addAccountBasedOnHeader_mailHeader_shouldSuccessfulValidation_allFields() {
         String header = "mail";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -98,10 +98,10 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_mailHeader_shouldSuccessfulValidation_onlyRequiredFields() {
         String header = "mail";
-        AccountCreationRequest request = AccountCreationRequest.builder()
-                                                               .email("required")
-                                                               .firstName("required")
-                                                               .build();
+        AccountRequest request = AccountRequest.builder()
+                                               .email("required")
+                                               .firstName("required")
+                                               .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -113,7 +113,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_mailHeader_shouldThrowConstraintValidationException_firstNameIsNull() {
         String header = "mail";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setFirstName(null);
 
         assertAll(
@@ -125,7 +125,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_mailHeader_shouldThrowConstraintValidationException_emailIsNull() {
         String header = "mail";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setEmail(null);
 
         assertAll(
@@ -137,7 +137,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_mobileHeader_shouldSuccessfulValidation_allFields() {
         String header = "mobile";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -149,9 +149,9 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_mobileHeader_shouldSuccessfulValidation_onlyRequiredFields() {
         String header = "mobile";
-        AccountCreationRequest request = AccountCreationRequest.builder()
-                                                               .phoneNumber("79998887766")
-                                                               .build();
+        AccountRequest request = AccountRequest.builder()
+                                               .phoneNumber("79998887766")
+                                               .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -163,7 +163,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_mobileHeader_shouldThrowConstraintValidationException_phoneNumberIsNull() {
         String header = "mobile";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setPhoneNumber(null);
 
         assertAll(
@@ -175,7 +175,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldSuccessfulValidation_allFields() {
         String header = "bank";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -187,14 +187,14 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldSuccessfulValidation_onlyRequiredFields() {
         String header = "bank";
-        AccountCreationRequest request = AccountCreationRequest.builder()
-                                                               .bankId(-1L)
-                                                               .lastName("required")
-                                                               .firstName("required")
-                                                               .middleName("required")
-                                                               .passport("1234 123456")
-                                                               .birthDate(LocalDate.now())
-                                                               .build();
+        AccountRequest request = AccountRequest.builder()
+                                               .bankId(-1L)
+                                               .lastName("required")
+                                               .firstName("required")
+                                               .middleName("required")
+                                               .passport("1234 123456")
+                                               .birthDate(LocalDate.now())
+                                               .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -206,7 +206,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldThrowConstraintValidationException_bankIdIsNull() {
         String header = "bank";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setBankId(null);
 
         assertAll(
@@ -218,7 +218,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldThrowConstraintValidationException_lastNameIsNull() {
         String header = "bank";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setLastName(null);
 
         assertAll(
@@ -230,7 +230,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldThrowConstraintValidationException_firstNameIsNull() {
         String header = "bank";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setFirstName(null);
 
         assertAll(
@@ -242,7 +242,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldThrowConstraintValidationException_middleNameIsNull() {
         String header = "bank";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setMiddleName(null);
 
         assertAll(
@@ -254,7 +254,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldThrowConstraintValidationException_passportIsNull() {
         String header = "bank";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setPassport(null);
 
         assertAll(
@@ -266,7 +266,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_bankHeader_shouldThrowConstraintValidationException_birthDateIsNull() {
         String header = "bank";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setBirthDate(null);
 
         assertAll(
@@ -278,7 +278,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldSuccessfulValidation_allFields() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -290,17 +290,17 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldSuccessfulValidation_onlyRequiredFields() {
         String header = "gosuslugi";
-        AccountCreationRequest request = AccountCreationRequest.builder()
-                                                               .bankId(-1L)
-                                                               .lastName("required")
-                                                               .firstName("required")
-                                                               .middleName("required")
-                                                               .passport("1234 123456")
-                                                               .birthplace("required")
-                                                               .birthDate(LocalDate.now())
-                                                               .phoneNumber("79998887766")
-                                                               .registrationAddress("required")
-                                                               .build();
+        AccountRequest request = AccountRequest.builder()
+                                               .bankId(-1L)
+                                               .lastName("required")
+                                               .firstName("required")
+                                               .middleName("required")
+                                               .passport("1234 123456")
+                                               .birthplace("required")
+                                               .birthDate(LocalDate.now())
+                                               .phoneNumber("79998887766")
+                                               .registrationAddress("required")
+                                               .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
 
         when(repository.save(any())).thenReturn(account);
@@ -312,7 +312,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_bankIdIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setBankId(null);
 
         assertAll(
@@ -324,7 +324,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_lastNameIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setLastName(null);
 
         assertAll(
@@ -336,7 +336,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_firstNameIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setFirstName(null);
 
         assertAll(
@@ -348,7 +348,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_middleNameIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setMiddleName(null);
 
         assertAll(
@@ -360,7 +360,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_birthDateIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setBirthDate(null);
 
         assertAll(
@@ -372,7 +372,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_passportIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setPassport(null);
 
         assertAll(
@@ -384,7 +384,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_birthplaceIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setBirthplace(null);
 
         assertAll(
@@ -396,7 +396,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_phoneNumberIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setPhoneNumber(null);
 
         assertAll(
@@ -408,7 +408,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_gosuslugiHeader_shouldThrowConstraintValidationException_registrationAddressIsNull() {
         String header = "gosuslugi";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setRegistrationAddress(null);
 
         assertAll(
@@ -421,7 +421,7 @@ class AccountServiceTest {
     @ValueSource(strings = {"1234123456", "1234 1234567", "asdf 1234as", "1234 9231P1", "12 34123456"})
     void addAccountBasedOnHeader_shouldThrowConstraintValidationException_passportDoesNotMatchPattern(String passport) {
         String header = "mail";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setPassport(passport);
 
         assertAll(
@@ -434,7 +434,7 @@ class AccountServiceTest {
     @ValueSource(strings = {"799900011223", "89990001122", "+79990001122", "799900011ab", "799900011 2"})
     void addAccountBasedOnHeader_shouldThrowConstraintValidationException_phoneNumberDoesNotMatchPattern(String phoneNumber) {
         String header = "mail";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
         request.setPhoneNumber(phoneNumber);
 
         assertAll(
@@ -446,7 +446,7 @@ class AccountServiceTest {
     @Test
     void addAccountBasedOnHeader_unknownHeader_shouldThrowDataNotFoundException() {
         String header = "someHeader";
-        AccountCreationRequest request = this.request;
+        AccountRequest request = this.request;
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))

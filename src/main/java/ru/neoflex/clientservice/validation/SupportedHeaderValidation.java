@@ -1,8 +1,8 @@
 package ru.neoflex.clientservice.validation;
 
-import ru.neoflex.clientservice.models.requests.AccountCreationRequest;
+import ru.neoflex.clientservice.models.requests.AccountRequest;
 
 public interface SupportedHeaderValidation {
 
-    AccountCreationRequest check(String header, AccountCreationRequest request);
+    AccountRequest check(String header, AccountRequest request);
 }

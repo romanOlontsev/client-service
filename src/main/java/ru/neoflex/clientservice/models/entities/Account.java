@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 @Entity
 @DynamicInsert
-//@Table(name = "client")
+@Table(name = "account")
 @Getter
 @Setter
 @Builder

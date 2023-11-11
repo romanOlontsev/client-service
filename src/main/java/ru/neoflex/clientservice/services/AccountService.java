@@ -10,7 +10,6 @@ import ru.neoflex.clientservice.models.entities.Account;
 import ru.neoflex.clientservice.models.requests.AccountRequest;
 import ru.neoflex.clientservice.models.responses.AccountResponse;
 import ru.neoflex.clientservice.repositories.AccountRepository;
-import ru.neoflex.clientservice.validation.SupportedHeaderValidation;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -26,39 +25,10 @@ public class AccountService {
 
     private final AccountMapper mapper;
 
-    private final List<SupportedHeaderValidation> supportedHeaderValidationList;
-
     public void addAccountBasedOnHeader(String header, AccountRequest request) {
-        List<String> requiredFields = headerValidationService.getRequiredFieldsByHeader(header);
-
-        if (requiredFields.isEmpty()) {
-            throw new DataNotFoundException(String.format("Header: %s not supported", header));
-        }
-
-        Field[] declaredFields = request.getClass()
-                                        .getDeclaredFields();
-
-
-        for (Field f : declaredFields) {
-            f.setAccessible(true);
-            try {
-                String fieldName = f.getName();
-                if (requiredFields.contains(fieldName) && f.get(request) == null) {
-                    throw new BadRequestException(
-                            String.format("Field missing: " + fieldName));
-                }
-            } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
-
-        }
-        Account account = mapper.accountFromAccountCreationRequest(request);
-        Account savedAccount = repository.save(account);
-        log.info("An account={} has been saved", savedAccount);
-    }
-
-    public void addAccountBasedOnHeaderOLD(String header, AccountRequest request) {
-        validateByHeader(header, request);
+        List<String> requiredFields = headerValidationService.getHeaderValidationByHeader(header)
+                                                              .getRequiredFields();
+        checkFieldsForNull(request, requiredFields);
         Account account = mapper.accountFromAccountCreationRequest(request);
         Account savedAccount = repository.save(account);
         log.info("An account={} has been saved", savedAccount);
@@ -84,11 +54,20 @@ public class AccountService {
         return accountResponses;
     }
 
-    private void validateByHeader(String header, AccountRequest request) {
-        supportedHeaderValidationList.stream()
-                                     .filter(it -> it.check(header, request) != null)
-                                     .findFirst()
-                                     .orElseThrow(() -> new DataNotFoundException(
-                                             String.format("Header: %s not supported", header)));
+    private void checkFieldsForNull(AccountRequest request, List<String> requiredFields) {
+        Field[] declaredFields = request.getClass()
+                                        .getDeclaredFields();
+        for (Field f : declaredFields) {
+            f.setAccessible(true);
+            try {
+                String fieldName = f.getName();
+                if (requiredFields.contains(fieldName) && f.get(request) == null) {
+                    throw new BadRequestException(
+                            String.format("Field missing: " + fieldName));
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 }

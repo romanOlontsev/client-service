@@ -1,5 +1,7 @@
 package ru.neoflex.clientservice.models.requests;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.util.List;
@@ -12,8 +14,11 @@ import java.util.List;
 @ToString
 public class HeaderValidationRequest {
 
+    @JsonProperty(value = "header")
+    @NotBlank
     private String headerName;
 
+    @JsonProperty(value = "required_fields")
     private List<String> requiredFields;
 
 }

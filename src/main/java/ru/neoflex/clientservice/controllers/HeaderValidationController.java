@@ -12,22 +12,68 @@ import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.neoflex.clientservice.models.requests.AccountRequest;
-import ru.neoflex.clientservice.models.responses.AccountResponse;
+import ru.neoflex.clientservice.models.requests.HeaderValidationRequest;
 import ru.neoflex.clientservice.models.responses.ApiErrorResponse;
+import ru.neoflex.clientservice.models.responses.HeaderValidationResponse;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/account")
+@RequestMapping("/admin/validation")
 @Validated
-public interface ClientController {
+public interface HeaderValidationController {
 
-    @Operation(summary = "Create account based on header")
+    @Operation(summary = "Get header validation rules")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "The account was created successfully"
+                    description = "The rules were successfully received",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = HeaderValidationResponse.class)
+                            )
+                    )
+            )
+    })
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    List<HeaderValidationResponse> getHeaderValidationList();
+
+    @Operation(summary = "Add header and required fields")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "The rule was created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "Invalid request parameters",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "409",
+                    description = "Header already exists",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    void addHeaderValidation(
+            @Parameter(in = ParameterIn.DEFAULT,
+                    schema = @Schema(implementation = HeaderValidationRequest.class))
+            @RequestBody
+            @Valid HeaderValidationRequest request);
+
+    @Operation(summary = "Update required fields for header")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "The rule was updated successfully"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -39,81 +85,39 @@ public interface ClientController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Header not supported",
+                    description = "Header not found",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    void accountCreation(
-            @Parameter(in = ParameterIn.HEADER,
-                    required = true)
-            @RequestHeader(value = "x-Source")
-            String header,
+    @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
+    void updateHeaderValidation(
             @Parameter(in = ParameterIn.DEFAULT,
-                    schema = @Schema(implementation = AccountRequest.class))
-            @Valid @RequestBody
-            AccountRequest request);
+                    schema = @Schema(implementation = HeaderValidationRequest.class))
+            @RequestBody
+            @Valid HeaderValidationRequest request);
 
-    @Operation(summary = "Get account by id")
+    @Operation(summary = "Delete header and required fields")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "The account was received successfully",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = AccountResponse.class)
-                    )
+                    description = "The rule was deleted successfully"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Account not found",
+                    description = "Header not found",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    AccountResponse getAccountById(
+    @DeleteMapping("/{header}")
+    void deleteHeaderValidation(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
-            @PathVariable(value = "id") Long accountId);
+            @PathVariable(value = "header") String header);
 
-    @Operation(summary = "Get accounts by params")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Accounts successfully received",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(
-                                    schema = @Schema(implementation = AccountResponse.class)
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "400",
-                    description = "Request without parameters",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            )
-    })
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    List<AccountResponse> findAccountByAccountFields(
-            @Parameter(in = ParameterIn.QUERY)
-            @RequestParam(value = "lastname", required = false) String lastName,
-            @Parameter(in = ParameterIn.QUERY)
-            @RequestParam(value = "firstname", required = false) String firstName,
-            @Parameter(in = ParameterIn.QUERY)
-            @RequestParam(value = "middlename", required = false) String middleName,
-            @Parameter(in = ParameterIn.QUERY)
-            @RequestParam(value = "phonenumber", required = false) String phoneNumber,
-            @Parameter(in = ParameterIn.QUERY)
-            @RequestParam(value = "email", required = false) String email
-    );
 }

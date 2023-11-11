@@ -3,6 +3,7 @@ package ru.neoflex.clientservice.handlers;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -13,6 +14,7 @@ import ru.neoflex.clientservice.models.responses.ApiErrorResponse;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestControllerAdvice
@@ -35,6 +37,17 @@ public class CustomExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handle(BadRequestException e) {
         String message = e.getMessage();
+        log.error(message);
+        return getApiErrorResponse(e, "400", message);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handle(MethodArgumentNotValidException e) {
+        String message = e.getFieldErrors()
+                          .stream()
+                          .map(it -> it.getField() + ": " + it.getDefaultMessage())
+                          .collect(Collectors.joining("; "));
         log.error(message);
         return getApiErrorResponse(e, "400", message);
     }

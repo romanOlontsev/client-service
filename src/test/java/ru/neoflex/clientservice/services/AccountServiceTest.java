@@ -1,14 +1,8 @@
 package ru.neoflex.clientservice.services;
 
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mapstruct.factory.Mappers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -18,14 +12,10 @@ import ru.neoflex.clientservice.exceptions.BadRequestException;
 import ru.neoflex.clientservice.exceptions.DataNotFoundException;
 import ru.neoflex.clientservice.mappers.AccountMapper;
 import ru.neoflex.clientservice.models.entities.Account;
+import ru.neoflex.clientservice.models.entities.HeaderValidation;
 import ru.neoflex.clientservice.models.requests.AccountRequest;
 import ru.neoflex.clientservice.models.responses.AccountResponse;
 import ru.neoflex.clientservice.repositories.AccountRepository;
-import ru.neoflex.clientservice.validation.SupportedHeaderValidation;
-import ru.neoflex.clientservice.validation.impls.BankHeaderValidation;
-import ru.neoflex.clientservice.validation.impls.GosuslugiHeaderValidation;
-import ru.neoflex.clientservice.validation.impls.MailHeaderValidation;
-import ru.neoflex.clientservice.validation.impls.MobileHeaderValidation;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -45,26 +35,15 @@ class AccountServiceTest {
     private AccountService service;
 
     @Mock
+    private HeaderValidationService headerValidationService;
+
+    @Mock
     private AccountRepository repository;
 
     @Spy
     private AccountMapper mapper = Mappers.getMapper(AccountMapper.class);
 
-    @Spy
-    private static List<SupportedHeaderValidation> supportedHeaderValidationList;
-
     private AccountRequest request;
-
-    @BeforeAll
-    public static void setupValidatorInstance() {
-        Validator validator = Validation.buildDefaultValidatorFactory()
-                                        .getValidator();
-        supportedHeaderValidationList = List.of(new BankHeaderValidation(validator),
-                new GosuslugiHeaderValidation(validator),
-                new MailHeaderValidation(validator),
-                new MobileHeaderValidation(validator));
-
-    }
 
     @BeforeEach
     void setUp() {
@@ -88,7 +67,12 @@ class AccountServiceTest {
         String header = "mail";
         AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of("firstName", "email"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -103,7 +87,12 @@ class AccountServiceTest {
                                                .firstName("required")
                                                .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of("firstName", "email"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -115,10 +104,17 @@ class AccountServiceTest {
         String header = "mail";
         AccountRequest request = this.request;
         request.setFirstName(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of("firstName", "email"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: firstName"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -127,10 +123,17 @@ class AccountServiceTest {
         String header = "mail";
         AccountRequest request = this.request;
         request.setEmail(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of("firstName", "email"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: email"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -139,7 +142,12 @@ class AccountServiceTest {
         String header = "mobile";
         AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of("phoneNumber"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -153,7 +161,12 @@ class AccountServiceTest {
                                                .phoneNumber("79998887766")
                                                .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of("phoneNumber"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -165,10 +178,16 @@ class AccountServiceTest {
         String header = "mobile";
         AccountRequest request = this.request;
         request.setPhoneNumber(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of("phoneNumber"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: phoneNumber"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -177,7 +196,18 @@ class AccountServiceTest {
         String header = "bank";
         AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -196,7 +226,18 @@ class AccountServiceTest {
                                                .birthDate(LocalDate.now())
                                                .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -208,10 +249,23 @@ class AccountServiceTest {
         String header = "bank";
         AccountRequest request = this.request;
         request.setBankId(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: bankId"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -220,10 +274,23 @@ class AccountServiceTest {
         String header = "bank";
         AccountRequest request = this.request;
         request.setLastName(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: lastName"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -232,10 +299,23 @@ class AccountServiceTest {
         String header = "bank";
         AccountRequest request = this.request;
         request.setFirstName(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: firstName"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -244,10 +324,23 @@ class AccountServiceTest {
         String header = "bank";
         AccountRequest request = this.request;
         request.setMiddleName(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: middleName"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -256,10 +349,23 @@ class AccountServiceTest {
         String header = "bank";
         AccountRequest request = this.request;
         request.setPassport(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: passport"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -268,10 +374,23 @@ class AccountServiceTest {
         String header = "bank";
         AccountRequest request = this.request;
         request.setBirthDate(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: birthDate"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -280,7 +399,21 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -302,7 +435,21 @@ class AccountServiceTest {
                                                .registrationAddress("required")
                                                .build();
         Account account = mapper.accountFromAccountCreationRequest(request);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
 
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
         when(repository.save(any())).thenReturn(account);
 
         assertAll(
@@ -314,10 +461,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setBankId(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: bankId"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -326,10 +489,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setLastName(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: lastName"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -338,10 +517,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setFirstName(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: firstName"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -350,10 +545,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setMiddleName(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: middleName"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -362,10 +573,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setBirthDate(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: birthDate"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -374,10 +601,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setPassport(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: passport"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -386,10 +629,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setBirthplace(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: birthplace"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -398,10 +657,26 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setPhoneNumber(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: phoneNumber"),
                 () -> verify(repository, times(0)).save(any()));
     }
 
@@ -410,51 +685,28 @@ class AccountServiceTest {
         String header = "gosuslugi";
         AccountRequest request = this.request;
         request.setRegistrationAddress(null);
+        HeaderValidation headerValidation = HeaderValidation.builder()
+                                                            .headerName(header)
+                                                            .requiredFields(List.of(
+                                                                    "bankId",
+                                                                    "lastName",
+                                                                    "firstName",
+                                                                    "middleName",
+                                                                    "birthDate",
+                                                                    "passport",
+                                                                    "birthplace",
+                                                                    "phoneNumber",
+                                                                    "registrationAddress"))
+                                                            .build();
+
+        when(headerValidationService.getHeaderValidationByHeader(header)).thenReturn(headerValidation);
 
         assertAll(
                 () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage("Field missing: registrationAddress"),
                 () -> verify(repository, times(0)).save(any()));
     }
-
-    @ParameterizedTest(name = "{index} - {0} passport number")
-    @ValueSource(strings = {"1234123456", "1234 1234567", "asdf 1234as", "1234 9231P1", "12 34123456"})
-    void addAccountBasedOnHeader_shouldThrowConstraintValidationException_passportDoesNotMatchPattern(String passport) {
-        String header = "mail";
-        AccountRequest request = this.request;
-        request.setPassport(passport);
-
-        assertAll(
-                () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
-                () -> verify(repository, times(0)).save(any()));
-    }
-
-    @ParameterizedTest(name = "{index} - {0} phone number")
-    @ValueSource(strings = {"799900011223", "89990001122", "+79990001122", "799900011ab", "799900011 2"})
-    void addAccountBasedOnHeader_shouldThrowConstraintValidationException_phoneNumberDoesNotMatchPattern(String phoneNumber) {
-        String header = "mail";
-        AccountRequest request = this.request;
-        request.setPhoneNumber(phoneNumber);
-
-        assertAll(
-                () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(ConstraintViolationException.class),
-                () -> verify(repository, times(0)).save(any()));
-    }
-
-    @Test
-    void addAccountBasedOnHeader_unknownHeader_shouldThrowDataNotFoundException() {
-        String header = "someHeader";
-        AccountRequest request = this.request;
-
-        assertAll(
-                () -> assertThatThrownBy(() -> service.addAccountBasedOnHeader(header, request))
-                        .isInstanceOf(DataNotFoundException.class)
-                        .hasMessage(String.format("Header: %s not supported", header)),
-                () -> verify(repository, times(0)).save(any()));
-    }
-
 
     @Test
     void getAccountById_shouldReturnExpected() {

@@ -27,7 +27,7 @@ public class AccountService {
 
     public void addAccountBasedOnHeader(String header, AccountRequest request) {
         List<String> requiredFields = headerValidationService.getHeaderValidationByHeader(header)
-                                                              .getRequiredFields();
+                                                             .getRequiredFields();
         checkFieldsForNull(request, requiredFields);
         Account account = mapper.accountFromAccountCreationRequest(request);
         Account savedAccount = repository.save(account);

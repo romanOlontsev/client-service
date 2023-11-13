@@ -48,6 +48,70 @@ Port 8080 was used by default so the value is easy to identify and change in the
 
 The list of endpoints can be viewed via the link: [http://localhost:8080/swagger-ui](http://localhost:8080/swagger-ui)
 
+#### header-validation-controller
+
+- `GET` `/admin/validation`
+
+Getting header validation rules
+
+Response:
+
+```json
+[
+  {
+    "id": 0,
+    "headerName": "string",
+    "requiredFields": [
+      "string"
+    ]
+  }
+]
+```
+
+- `POST` `/admin/validation`
+
+Adding header validation rules
+
+Request:
+
+```json
+[
+  {
+    "id": 0,
+    "headerName": "string",
+    "requiredFields": [
+      "string"
+    ]
+  }
+]
+```
+
+- `PUT` `/admin/validation`
+
+Updating header validation rules
+
+Request:
+
+```json
+[
+  {
+    "id": 0,
+    "headerName": "string",
+    "requiredFields": [
+      "string"
+    ]
+  }
+]
+```
+
+- `DELETE` `/admin/validation`
+
+Deleting header validation rules by header name
+
+Param: `header`
+
+#### client-controller
+
 - `GET` `/api/account`
 
 Getting accounts according to parameters.
@@ -80,10 +144,6 @@ Response:
 - `POST` `/api/account`
 
 Adding a client account based on header. Header name `x-Source`.
-
-Supported headers:
-
-`mail` `mobile` `bank` `gosuslugi`
 
 Body:
 

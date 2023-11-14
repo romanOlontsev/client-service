@@ -6,16 +6,35 @@ services:
     environment:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=admin
-      - POSTGRES_DB=account_db
+      - POSTGRES_DB=client_db
+    ports:
+      - "5432:5432"
     volumes:
       - postgres:/var/lib/postgresql/data
+    networks:
+      - backend
+
+  liquibase-migrations:
+    image: liquibase/liquibase:4.18
+    depends_on:
+      - postgresql
+    command:
+      - --hub-mode=off
+      - --changelog-file=master.xml
+      - --driver=org.postgresql.Driver
+      - --url=jdbc:postgresql://postgresql:5432/client_db
+      - --username=admin
+      - --password=admin
+      - update
+    volumes:
+      - ./migrations:/liquibase/changelog
     networks:
       - backend
 
   service:
     depends_on:
       - postgresql
-    build: .
+    build: users/.
     environment:
       - spring_datasource_url=jdbc:postgresql://postgresql:5432/account_db
     ports:

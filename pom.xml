@@ -19,10 +19,13 @@
     <modules>
         <module>users</module>
         <module>products</module>
+        <module>tariffs</module>
+        <module>backend-client-service</module>
     </modules>
 
     <properties>
         <java.version>17</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <snakeyaml.version>2.2</snakeyaml.version>
         <mapstruct.version>1.5.5.Final</mapstruct.version>
         <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>

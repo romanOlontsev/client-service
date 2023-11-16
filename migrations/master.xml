@@ -8,5 +8,6 @@
        http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <include file="users-schema.sql"/>
-<!--    <include file="users-insert.sql"/>-->
+    <include file="tariffs-schema.sql"/>
+    <include file="products-schema.sql"/>
 </databaseChangeLog>

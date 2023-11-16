@@ -31,14 +31,25 @@ services:
     networks:
       - backend
 
-  service:
+  users-service:
     depends_on:
       - postgresql
     build: users/.
     environment:
-      - spring_datasource_url=jdbc:postgresql://postgresql:5432/account_db
+      - spring_datasource_url=jdbc:postgresql://postgresql:5432/client_db
     ports:
       - "8080:8080"
+    networks:
+      - backend
+
+  tariffs-service:
+    depends_on:
+      - postgresql
+    build: tariffs/.
+    environment:
+      - spring_datasource_url=jdbc:postgresql://postgresql:5432/client_db
+    ports:
+      - "8082:8082"
     networks:
       - backend
 

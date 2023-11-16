@@ -1,4 +1,4 @@
-package ru.neoflex.users.configuration;
+package ru.neoflex.products.configuration;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -13,7 +13,7 @@ public class OpenApiConfiguration {
     public OpenAPI openApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Users API")
+                        .title("Products API")
                         .version("0.0.1-SNAPSHOT")
                         .contact(new Contact()
                                 .name("Roman Olontsev")

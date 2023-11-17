@@ -1,4 +1,4 @@
-package ru.neoflex.tariffs.controllers;
+package ru.neoflex.gateway.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,33 +8,36 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.neoflex.tariffs.models.requests.TariffRequest;
-import ru.neoflex.tariffs.models.responses.ApiErrorResponse;
-import ru.neoflex.tariffs.models.responses.TariffResponse;
+import ru.neoflex.gateway.models.requests.ProductRequest;
+import ru.neoflex.gateway.models.requests.TariffRequest;
+import ru.neoflex.gateway.models.responses.ApiErrorResponse;
+import ru.neoflex.gateway.models.responses.ProductResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tariff")
+@RequestMapping("/api/product")
 @Validated
-public interface TariffsController {
+public interface ProductGatewayController {
 
-    @Operation(summary = "Get the current version of tariff")
+    @Operation(summary = "Get the current version of product")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "The tariff were successfully received",
+                    description = "The product were successfully received",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = TariffResponse.class)
+                            schema = @Schema(implementation = ProductResponse.class)
                     )
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "The tariff not found",
+                    description = "The product not found",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiErrorResponse.class)
@@ -42,26 +45,26 @@ public interface TariffsController {
             )
     })
     @GetMapping(value = "/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    TariffResponse getCurrentVersionOfTariffById(
+    ProductResponse getCurrentVersionOfProductById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
 
-    @Operation(summary = "Get the previous versions of tariff")
+    @Operation(summary = "Get the previous versions of product")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "The tariffs were successfully received",
+                    description = "The product were successfully received",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             array = @ArraySchema(
-                                    schema = @Schema(implementation = TariffResponse.class)
+                                    schema = @Schema(implementation = ProductResponse.class)
                             )
                     )
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "The tariff not found",
+                    description = "The product not found",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiErrorResponse.class)
@@ -69,17 +72,47 @@ public interface TariffsController {
             )
     })
     @GetMapping(value = "/{id}/previous", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<TariffResponse> getPreviousVersionsOfTariffById(
+    List<ProductResponse> getPreviousVersionsOfProductById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
 
-
-    @Operation(summary = "Create tariff")
+    @Operation(summary = "Get the version of product for a certain period")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "The tariff was created successfully"
+                    description = "The product were successfully received",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ProductResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The product not found",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping(value = "/{id}/period", produces = MediaType.APPLICATION_JSON_VALUE)
+    ProductResponse getVersionsOfProductForCertainPeriodById(
+            @Parameter(in = ParameterIn.PATH,
+                    required = true)
+            @PathVariable(value = "id") String id,
+            @Parameter(in = ParameterIn.QUERY,
+                    required = true)
+            @RequestParam(value = "datetime")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime dateTime);
+
+
+    @Operation(summary = "Create product")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "The product was created successfully"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -91,45 +124,43 @@ public interface TariffsController {
             )
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    void createTariff(
+    void createProduct(
             @Parameter(in = ParameterIn.DEFAULT,
-                    schema = @Schema(implementation = TariffRequest.class))
-            @RequestBody TariffRequest request);
+                    schema = @Schema(implementation = ProductRequest.class))
+            @RequestBody ProductRequest request);
 
 
-    @Operation(summary = "Update a tariff version")
+    @Operation(summary = "Rollback a product version")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Update successful"
+                    description = "Rollback successful"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "The tariff not found",
+                    description = "The product not found",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiErrorResponse.class)
                     )
             )
     })
-    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    void updateTariff(
+    @PutMapping(value = "/{id}/rollback")
+    void rollBackProductVersion(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
-            @PathVariable(value = "id") String id,
-            @Parameter(in = ParameterIn.DEFAULT,
-                    schema = @Schema(implementation = TariffRequest.class))
-            @RequestBody TariffRequest request);
+            @PathVariable(value = "id") String id);
 
-    @Operation(summary = "Delete tariff")
+
+    @Operation(summary = "Delete product")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "The tariff was deleted successfully"
+                    description = "The product was deleted successfully"
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "Tariff not found",
+                    description = "Product not found",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = ApiErrorResponse.class)
@@ -137,9 +168,10 @@ public interface TariffsController {
             )
     })
     @DeleteMapping("/{id}")
-    void deleteTariff(
+    void deleteProduct(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
 
 }
+

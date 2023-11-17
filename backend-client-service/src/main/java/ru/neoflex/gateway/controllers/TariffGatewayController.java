@@ -1,4 +1,4 @@
-package ru.neoflex.tariffs.controllers;
+package ru.neoflex.gateway.controllers;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -8,72 +8,22 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.neoflex.tariffs.models.requests.TariffRequest;
-import ru.neoflex.tariffs.models.responses.ApiErrorResponse;
-import ru.neoflex.tariffs.models.responses.TariffResponse;
+import ru.neoflex.gateway.models.requests.ProductRequest;
+import ru.neoflex.gateway.models.requests.TariffRequest;
+import ru.neoflex.gateway.models.responses.ApiErrorResponse;
+import ru.neoflex.gateway.models.responses.ProductResponse;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/tariff")
 @Validated
-public interface TariffsController {
-
-    @Operation(summary = "Get the current version of tariff")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "The tariff were successfully received",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = TariffResponse.class)
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "The tariff not found",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            )
-    })
-    @GetMapping(value = "/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    TariffResponse getCurrentVersionOfTariffById(
-            @Parameter(in = ParameterIn.PATH,
-                    required = true)
-            @PathVariable(value = "id") String id);
-
-    @Operation(summary = "Get the previous versions of tariff")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "The tariffs were successfully received",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(
-                                    schema = @Schema(implementation = TariffResponse.class)
-                            )
-                    )
-            ),
-            @ApiResponse(
-                    responseCode = "404",
-                    description = "The tariff not found",
-                    content = @Content(
-                            mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = ApiErrorResponse.class)
-                    )
-            )
-    })
-    @GetMapping(value = "/{id}/previous", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<TariffResponse> getPreviousVersionsOfTariffById(
-            @Parameter(in = ParameterIn.PATH,
-                    required = true)
-            @PathVariable(value = "id") String id);
-
+public interface TariffGatewayController {
 
     @Operation(summary = "Create tariff")
     @ApiResponses(value = {
@@ -141,5 +91,5 @@ public interface TariffsController {
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
-
 }
+

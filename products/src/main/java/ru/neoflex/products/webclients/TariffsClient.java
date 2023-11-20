@@ -9,7 +9,11 @@ import ru.neoflex.products.models.responses.TariffResponse;
 @FeignClient(value = "tariffs", url = "${tariffs.client.base-url}", configuration = CustomErrorDecoder.class)
 public interface TariffsClient {
 
-    @GetMapping(value = "/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     TariffResponse getCurrentVersionOfTariffById(@PathVariable(value = "id") String id);
+
+    @GetMapping(value = "{id}/versions/{version}", produces = MediaType.APPLICATION_JSON_VALUE)
+    TariffResponse getTariffByIdAndVersion(@PathVariable(value = "id") String id,
+                                           @PathVariable(value = "version") Long version);
 
 }

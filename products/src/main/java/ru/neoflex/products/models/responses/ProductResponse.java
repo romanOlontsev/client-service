@@ -38,6 +38,6 @@ public class ProductResponse {
     @JsonProperty(value = "author")
     private UUID author;
 
-    @JsonProperty(value = "version")
-    private Long version;
+    @JsonProperty(value = "product_version")
+    private Long productVersion;
 }

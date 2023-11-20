@@ -32,44 +32,41 @@ public class ProductService {
     public ProductResponse getCurrentVersionOfProductById(String id) {
         Product foundProduct = findProductById(id);
         ProductResponse productResponse = mapper.productResponseFromProduct(foundProduct);
-        TariffResponse tariffResponse = getTariffByIdIfExists(foundProduct.getTariff());
-        productResponse.setTariff(tariffResponse);
+        if (foundProduct.getTariff() != null) {
+            TariffResponse tariffResponse = getTariffByIdIfExists(foundProduct.getTariff());
+            productResponse.setTariff(tariffResponse);
+        }
         log.info("The current version of the product: {} has been received", productResponse);
         return productResponse;
     }
-//  TODO get tariff by version
+
     @Transactional
     public List<ProductResponse> getPreviousVersionsOfProductById(String id) {
         List<Product> previousVersions = repository.findPreviousVersionsOfProductById(UUID.fromString(id));
-
         List<ProductResponse> responseList = new ArrayList<>();
         for (Product product : previousVersions) {
             ProductResponse productResponse = mapper.productResponseFromProduct(product);
-            TariffResponse tariffResponse = getTariffByIdIfExists(product.getTariff());
-            productResponse.setTariff(tariffResponse);
+            setTariffForProductByIdAndVersionIfExists(product, productResponse);
             responseList.add(productResponse);
         }
         log.info("Previous versions of the product: {} were received", responseList);
         return responseList;
     }
-//  TODO get tariff by version
+
     @Transactional
     public ProductResponse getVersionOfProductForCertainPeriodById(String id, LocalDateTime dateTime) {
         Product foundProduct = repository.findVersionOfProductForCertainPeriodById(UUID.fromString(id), dateTime)
                                          .orElseThrow(() -> new DataNotFoundException(
                                                  String.format("Version for product with id=%s for period %s not found", id, dateTime)));
         ProductResponse productResponse = mapper.productResponseFromProduct(foundProduct);
-        TariffResponse tariffResponse = getTariffByIdIfExists(foundProduct.getTariff());
-        productResponse.setTariff(tariffResponse);
+        setTariffForProductByIdAndVersionIfExists(foundProduct, productResponse);
         log.info("Product version for the {} period: {} has been received", dateTime, productResponse);
         return productResponse;
     }
 
     public void createProduct(ProductRequest request) {
-        UUID tariffId = request.getTariff();
-        getTariffByIdIfExists(tariffId);
         Product product = mapper.productFromProductRequest(request);
-        product.increaseVersion();
+        setTariffForProductByIdIfExists(product, request);
         Product savedProduct = repository.save(product);
         log.info("The product: {} has been saved", savedProduct);
     }
@@ -81,20 +78,20 @@ public class ProductService {
                                             .orElseThrow(() -> new DataNotFoundException(
                                                     String.format("Previous version for product with id=%s not found", id)));
         mapper.updateProduct(foundProject, previousVersion);
-        foundProject.increaseVersion();
         log.info("The product: {} has been rolled back", foundProject);
     }
 
     @Transactional
     public void updateProduct(String id, ProductRequest request) {
         Product foundProject = findProductById(id);
+        setTariffForProductByIdIfExists(foundProject, request);
         mapper.updateProductFromProductRequest(foundProject, request);
-        foundProject.increaseVersion();
         log.info("The product: {} has been updated", foundProject);
     }
 
     public void deleteProductById(String id) {
-        repository.deleteById(UUID.fromString(id));
+        Product foundProduct = findProductById(id);
+        repository.delete(foundProduct);
         log.info("The product with id={} has been deleted", id);
     }
 
@@ -105,9 +102,23 @@ public class ProductService {
     }
 
     private TariffResponse getTariffByIdIfExists(UUID tariffId) {
-        if (tariffId != null) {
-            return tariffsClient.getCurrentVersionOfTariffById(tariffId.toString());
+        return tariffsClient.getCurrentVersionOfTariffById(tariffId.toString());
+    }
+
+    private void setTariffForProductByIdAndVersionIfExists(Product foundProduct, ProductResponse productResponse) {
+        if (foundProduct.getTariff() != null) {
+            TariffResponse tariffResponse = tariffsClient.getTariffByIdAndVersion(
+                    String.valueOf(foundProduct.getTariff()), foundProduct.getTariffVersion());
+            productResponse.setTariff(tariffResponse);
         }
-        return null;
+    }
+
+    private void setTariffForProductByIdIfExists(Product product, ProductRequest request) {
+        if (product.getTariff() == null && request.getTariff() != null) {
+            UUID tariffId = request.getTariff();
+            TariffResponse foundTariff = getTariffByIdIfExists(tariffId);
+            product.setTariff(tariffId);
+            product.setTariffVersion(foundTariff.getVersion());
+        }
     }
 }

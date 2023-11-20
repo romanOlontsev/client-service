@@ -81,7 +81,7 @@ services:
       - postgresql
     build: products/.
     environment:
-      - tariffs_client_base_url=http://tariffs-service:8082/api/tariff
+      - tariffs_client_base_url=http://tariffs-service:8082/api/tariffs
       - spring_datasource_url=jdbc:postgresql://postgresql:5432/client_db
     ports:
       - "8081:8081"
@@ -95,8 +95,8 @@ services:
       - users-service
     build: backend-client-service/.
     environment:
-      - products_client_base_url=http://products-service:8081/api/product
-      - tariffs_client_base_url=http://tariffs-service:8082/api/tariff
+      - products_client_base_url=http://products-service:8081/api/products
+      - tariffs_client_base_url=http://tariffs-service:8082/api/tariffs
     ports:
       - "8083:8083"
     networks:

@@ -22,6 +22,8 @@ public interface ProductMapper {
 
     void updateProductFromProductRequest(@MappingTarget Product product, ProductRequest request);
 
-    @Mapping(target = "version", ignore = true)
+    @Mapping(target = "productVersion", ignore = true)
+    @Mapping(target = "tariffVersion", ignore = true)
+    @Mapping(target = "tariff", ignore = true)
     void updateProduct(@MappingTarget Product productTarget, Product source);
 }

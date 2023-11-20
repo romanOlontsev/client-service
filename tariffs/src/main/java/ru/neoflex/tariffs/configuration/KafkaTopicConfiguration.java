@@ -17,9 +17,6 @@ public class KafkaTopicConfiguration {
     @Value(value = "${spring.kafka.bootstrap-servers}")
     private String bootstrapAddress;
 
-    @Value(value = "${spring.kafka.topic-name}")
-    private String topicName;
-
     @Bean
     public KafkaAdmin kafkaAdmin() {
         Map<String, Object> configs = new HashMap<>();
@@ -29,7 +26,13 @@ public class KafkaTopicConfiguration {
 
     @Bean
     public NewTopic tariffUpdatedTopic() {
-        return TopicBuilder.name(topicName)
+        return TopicBuilder.name(TopicNames.TARIFF_UPDATED.name())
+                           .build();
+    }
+
+    @Bean
+    public NewTopic tariffDeleteTopic() {
+        return TopicBuilder.name(TopicNames.TARIFF_DELETED.name())
                            .build();
     }
 }

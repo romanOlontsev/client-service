@@ -21,6 +21,11 @@ public class TariffsControllerImpl implements TariffsController {
     }
 
     @Override
+    public TariffResponse getTariffByIdAndVersion(String id, Long version) {
+        return service.getTariffByIdAndVersion(id, version);
+    }
+
+    @Override
     public List<TariffResponse> getPreviousVersionsOfTariffById(String id) {
         return service.getPreviousVersionsOfTariffById(id);
     }

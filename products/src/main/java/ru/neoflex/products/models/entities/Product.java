@@ -46,14 +46,19 @@ public class Product {
     @Column(name = "author")
     private UUID author;
 
-    @Column(name = "version")
-    private Long version;
+    @Column(name = "product_version")
+    private Long productVersion;
 
+    @Column(name = "tariff_version")
+    private Long tariffVersion;
+
+    @PrePersist
+    @PreUpdate
     public void increaseVersion() {
-        if (version == null) {
-            version = 1L;
+        if (productVersion == null) {
+            productVersion = 1L;
         } else {
-            ++version;
+            ++productVersion;
         }
     }
 }

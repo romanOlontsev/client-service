@@ -18,7 +18,7 @@ import ru.neoflex.tariffs.models.responses.TariffResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tariff")
+@RequestMapping("/api/tariffs")
 @Validated
 public interface TariffsController {
 
@@ -26,7 +26,7 @@ public interface TariffsController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "The tariff were successfully received",
+                    description = "The tariff was successfully received",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = TariffResponse.class)
@@ -41,11 +41,39 @@ public interface TariffsController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     TariffResponse getCurrentVersionOfTariffById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
+
+    @Operation(summary = "Get the version of tariff by version number")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "The version of tariff was successfully received",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = TariffResponse.class)
+                    )
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The tariff not found",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @GetMapping(value = "{id}/versions/{version}", produces = MediaType.APPLICATION_JSON_VALUE)
+    TariffResponse getTariffByIdAndVersion(
+            @Parameter(in = ParameterIn.PATH,
+                    required = true)
+            @PathVariable(value = "id") String id,
+            @Parameter(in = ParameterIn.PATH,
+                    required = true)
+            @PathVariable(value = "version") Long version);
 
     @Operation(summary = "Get the previous versions of tariff")
     @ApiResponses(value = {
@@ -68,7 +96,7 @@ public interface TariffsController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/previous", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
     List<TariffResponse> getPreviousVersionsOfTariffById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)

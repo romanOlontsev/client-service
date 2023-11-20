@@ -49,13 +49,7 @@ public class Product {
     @Column(name = "version")
     private Long version;
 
-    @PrePersist
-    @PreUpdate
-    public void onModifying() {
-        upVersion();
-    }
-
-    private void upVersion() {
+    public void increaseVersion() {
         if (version == null) {
             version = 1L;
         } else {

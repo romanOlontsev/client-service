@@ -37,7 +37,7 @@ public class ProductService {
         log.info("The current version of the product: {} has been received", productResponse);
         return productResponse;
     }
-
+//  TODO get tariff by version
     @Transactional
     public List<ProductResponse> getPreviousVersionsOfProductById(String id) {
         List<Product> previousVersions = repository.findPreviousVersionsOfProductById(UUID.fromString(id));
@@ -52,7 +52,7 @@ public class ProductService {
         log.info("Previous versions of the product: {} were received", responseList);
         return responseList;
     }
-
+//  TODO get tariff by version
     @Transactional
     public ProductResponse getVersionOfProductForCertainPeriodById(String id, LocalDateTime dateTime) {
         Product foundProduct = repository.findVersionOfProductForCertainPeriodById(UUID.fromString(id), dateTime)
@@ -69,6 +69,7 @@ public class ProductService {
         UUID tariffId = request.getTariff();
         getTariffByIdIfExists(tariffId);
         Product product = mapper.productFromProductRequest(request);
+        product.increaseVersion();
         Product savedProduct = repository.save(product);
         log.info("The product: {} has been saved", savedProduct);
     }
@@ -80,6 +81,7 @@ public class ProductService {
                                             .orElseThrow(() -> new DataNotFoundException(
                                                     String.format("Previous version for product with id=%s not found", id)));
         mapper.updateProduct(foundProject, previousVersion);
+        foundProject.increaseVersion();
         log.info("The product: {} has been rolled back", foundProject);
     }
 
@@ -87,6 +89,7 @@ public class ProductService {
     public void updateProduct(String id, ProductRequest request) {
         Product foundProject = findProductById(id);
         mapper.updateProductFromProductRequest(foundProject, request);
+        foundProject.increaseVersion();
         log.info("The product: {} has been updated", foundProject);
     }
 

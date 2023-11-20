@@ -19,6 +19,8 @@ import java.util.UUID;
 @Slf4j
 public class TariffsService {
 
+    private final KafkaService kafkaService;
+
     private final TariffRepository repository;
 
     private final TariffMapper mapper;
@@ -38,20 +40,21 @@ public class TariffsService {
         return response;
     }
 
-    public void createProduct(TariffRequest request) {
+    public void createTariff(TariffRequest request) {
         Tariff tariff = mapper.tariffFromTariffRequest(request);
         Tariff savedTariff = repository.save(tariff);
         log.info("The tariff: {} has been saved", savedTariff);
     }
 
     @Transactional
-    public void updateProduct(String id, TariffRequest request) {
+    public void updateTariff(String id, TariffRequest request) {
         Tariff foundTariff = findTariffById(id);
         mapper.updateTariffFromTariffRequest(foundTariff, request);
         log.info("The tariff: {} has been updated", foundTariff);
+        kafkaService.sendMessage(id);
     }
 
-    public void deleteProductById(String id) {
+    public void deleteTariffById(String id) {
         repository.deleteById(UUID.fromString(id));
         log.info("The tariff with id={} has been deleted", id);
     }

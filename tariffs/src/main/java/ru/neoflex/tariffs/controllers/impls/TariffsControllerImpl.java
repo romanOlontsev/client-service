@@ -27,16 +27,16 @@ public class TariffsControllerImpl implements TariffsController {
 
     @Override
     public void createTariff(TariffRequest request) {
-        service.createProduct(request);
+        service.createTariff(request);
     }
 
     @Override
     public void updateTariff(String id, TariffRequest request) {
-        service.updateProduct(id, request);
+        service.updateTariff(id, request);
     }
 
     @Override
     public void deleteTariff(String id) {
-        service.deleteProductById(id);
+        service.deleteTariffById(id);
     }
 }

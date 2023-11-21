@@ -11,6 +11,6 @@ import java.util.List;
 @FeignClient(value = "products", url = "${products.client.base-url}")
 public interface ProductClient {
 
-    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/products",produces = MediaType.APPLICATION_JSON_VALUE)
     List<ProductResponse> getProductsByTariffId(@RequestParam(value = "tariff") String tariffId);
 }

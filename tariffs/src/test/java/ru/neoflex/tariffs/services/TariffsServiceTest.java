@@ -1,5 +1,9 @@
 package ru.neoflex.tariffs.services;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
+import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
+import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
@@ -12,12 +16,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.neoflex.tariffs.configuration.IntegrationEnvironment;
+import ru.neoflex.tariffs.configuration.ProductsMocks;
 import ru.neoflex.tariffs.configuration.TestDbConfiguration;
+import ru.neoflex.tariffs.exceptions.BadRequestException;
 import ru.neoflex.tariffs.exceptions.DataNotFoundException;
-import ru.neoflex.tariffs.mappers.TariffMapper;
 import ru.neoflex.tariffs.models.entities.Tariff;
 import ru.neoflex.tariffs.models.requests.TariffRequest;
 import ru.neoflex.tariffs.models.responses.TariffResponse;
@@ -25,6 +31,7 @@ import ru.neoflex.tariffs.repositories.TariffRepository;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -37,8 +44,12 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
 @SpringBootTest
+@EnableFeignClients
 @Rollback
 @Transactional
+@EnableWireMock({
+        @ConfigureWireMock(name = "products-service", property = "products.client.base-url")
+})
 class TariffsServiceTest extends IntegrationEnvironment {
 
     @Autowired
@@ -50,8 +61,8 @@ class TariffsServiceTest extends IntegrationEnvironment {
     @Autowired
     private TariffRepository repository;
 
-    @Autowired
-    private TariffMapper mapper;
+    @InjectWireMock("products-service")
+    private WireMockServer wiremock;
 
     @BeforeEach
     void setUp() {
@@ -59,10 +70,10 @@ class TariffsServiceTest extends IntegrationEnvironment {
              Database database = DatabaseFactory.getInstance()
                                                 .findCorrectDatabaseImplementation(new JdbcConnection(connection))) {
             Liquibase liquibase = new liquibase.Liquibase("master.xml",
-                    new DirectoryResourceAccessor(new File("").toPath()
-                                                              .toAbsolutePath()
-                                                              .getParent()
-                                                              .resolve("migrations")), database
+                                                          new DirectoryResourceAccessor(new File("").toPath()
+                                                                                                    .toAbsolutePath()
+                                                                                                    .getParent()
+                                                                                                    .resolve("migrations")), database
             );
             liquibase.update(new Contexts(), new LabelExpression());
         } catch (LiquibaseException | SQLException | FileNotFoundException e) {
@@ -89,7 +100,7 @@ class TariffsServiceTest extends IntegrationEnvironment {
         assertAll(
                 () -> assertThat(response).isNotNull()
                                           .isEqualTo(expected)
-        );
+                 );
     }
 
     @Test
@@ -100,7 +111,7 @@ class TariffsServiceTest extends IntegrationEnvironment {
                 () -> assertThatThrownBy(() -> service.getCurrentVersionOfTariffById(tariffId))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Tariff with id=%s not found", tariffId))
-        );
+                 );
     }
 
     @Test
@@ -124,7 +135,7 @@ class TariffsServiceTest extends IntegrationEnvironment {
                                           .isNotEmpty()
                                           .hasSize(1)
                                           .isEqualTo(expectedList)
-        );
+                 );
     }
 
     @Test
@@ -136,7 +147,7 @@ class TariffsServiceTest extends IntegrationEnvironment {
         assertAll(
                 () -> assertThat(response).isNotNull()
                                           .isEmpty()
-        );
+                 );
     }
 
     @Test
@@ -157,7 +168,7 @@ class TariffsServiceTest extends IntegrationEnvironment {
         assertAll(
                 () -> assertThat(response).isNotNull()
                                           .isEqualTo(expected)
-        );
+                 );
     }
 
     @Test
@@ -169,7 +180,7 @@ class TariffsServiceTest extends IntegrationEnvironment {
                 () -> assertThatThrownBy(() -> service.getTariffByIdAndVersion(tariffId, version))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Tariff with id=%s and version %s not found", tariffId, version))
-        );
+                 );
     }
 
     @Test
@@ -190,35 +201,49 @@ class TariffsServiceTest extends IntegrationEnvironment {
                 () -> assertThat(allTariffs.get(2)).extracting(Tariff::getRate)
                                                    .isEqualTo(request.getRate())
 
-        );
+                 );
     }
 
-//    @Test
-//    void updateTariff() {
-//    }
-//
-//    @Test
-//    void deleteTariffById_shouldDeleteTariff() {
-//        TariffRequest request = TariffRequest.builder()
-//                                             .name("~test")
-//                                             .rate(23.212)
-//                                             .build();
-//        service.createTariff(request);
-//        List<Tariff> allTariffs = repository.findAll();
-//        Tariff tariffToDelete = allTariffs.stream()
-//                                   .filter(it -> it.getName()
-//                                                   .equals(request.getName()))
-//                                   .findFirst()
-//                                   .get();
-//
-//        service.deleteTariffById(tariffToDelete.getId().toString());
-//
-//        assertAll(
-//                () -> assertThat(allTariffs).isNotEmpty()
-//                                            .hasSize(1),
-//                () -> assertThat(allTariffs.get(0)).extracting(Tariff::getName)
-//                                                   .isNotEqualTo(request.getName())
-//
-//        );
-//    }
+    @Test
+    void deleteTariffById_shouldDeleteTariff() throws IOException {
+        TariffRequest request = TariffRequest.builder()
+                                             .name("~test")
+                                             .build();
+        service.createTariff(request);
+        List<Tariff> allTariffs = repository.findAll();
+        Tariff tariffToDelete = allTariffs.stream()
+                                          .filter(it -> it.getName()
+                                                          .equals(request.getName()))
+                                          .findFirst()
+                                          .get();
+        String tariffId = tariffToDelete.getId()
+                                        .toString();
+
+        ProductsMocks.setupMockResponse(wiremock, tariffId, "payload/response_is_empty.json");
+        service.deleteTariffById(tariffId);
+        List<Tariff> tariffs = repository.findAll();
+
+        assertAll(
+                () -> assertThat(tariffs).isNotEmpty()
+                                         .hasSize(2),
+                () -> assertThat(tariffs.get(0)).extracting(Tariff::getName)
+                                                .isNotEqualTo(request.getName()),
+                () -> assertThat(tariffs.get(1)).extracting(Tariff::getName)
+                                                .isNotEqualTo(request.getName())
+
+                 );
+    }
+
+    @Test
+    void deleteTariffById_shouldThrowBadRequestException() throws IOException {
+        String tariffId = "a32b8ba4-2dce-437c-ae94-34563b7ada43";
+
+        ProductsMocks.setupMockResponse(wiremock, tariffId, "payload/product_response.json");
+
+        assertAll(
+                () -> assertThatThrownBy(() -> service.deleteTariffById(tariffId))
+                        .isInstanceOf(BadRequestException.class)
+                        .hasMessage(String.format("There are products that refer to a tariff with an id=%s", tariffId))
+                 );
+    }
 }

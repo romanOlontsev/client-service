@@ -94,6 +94,12 @@
             <artifactId>liquibase-core</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.maciejwalkowiak.spring</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>${wiremock-spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>

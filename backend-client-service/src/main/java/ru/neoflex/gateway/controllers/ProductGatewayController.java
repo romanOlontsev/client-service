@@ -8,12 +8,12 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.neoflex.gateway.models.requests.ProductRequest;
-import ru.neoflex.gateway.models.requests.TariffRequest;
 import ru.neoflex.gateway.models.responses.ApiErrorResponse;
 import ru.neoflex.gateway.models.responses.ProductResponse;
 
@@ -44,7 +44,7 @@ public interface ProductGatewayController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getCurrentVersionOfProductById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
@@ -71,7 +71,7 @@ public interface ProductGatewayController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/previous", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ProductResponse> getPreviousVersionsOfProductById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
@@ -96,7 +96,7 @@ public interface ProductGatewayController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/period", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/period", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getVersionsOfProductForCertainPeriodById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
@@ -127,7 +127,7 @@ public interface ProductGatewayController {
     void createProduct(
             @Parameter(in = ParameterIn.DEFAULT,
                     schema = @Schema(implementation = ProductRequest.class))
-            @RequestBody ProductRequest request);
+            @RequestBody @Valid ProductRequest request);
 
 
     @Operation(summary = "Rollback a product version")
@@ -151,6 +151,30 @@ public interface ProductGatewayController {
                     required = true)
             @PathVariable(value = "id") String id);
 
+
+    @Operation(summary = "Update a product")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Update successful"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "The product not found",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = ApiErrorResponse.class)
+                    )
+            )
+    })
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    void updateProduct(
+            @Parameter(in = ParameterIn.PATH,
+                    required = true)
+            @PathVariable(value = "id") String id,
+            @Parameter(in = ParameterIn.DEFAULT,
+                    schema = @Schema(implementation = ProductRequest.class))
+            @RequestBody ProductRequest request);
 
     @Operation(summary = "Delete product")
     @ApiResponses(value = {

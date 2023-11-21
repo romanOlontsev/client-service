@@ -31,17 +31,4 @@ public class KafkaMessageListener {
             product.setTariffVersion(tariffVersion);
         }
     }
-
-    @KafkaListener(topics = "TARIFF_DELETED")
-    @Transactional
-    public void updateProductWhenTariffDeleted(TariffMessage message) {
-        UUID tariffId = message.getTariffId();
-        log.info("Message received: tariff with id={} deleted",
-                 tariffId.toString());
-        List<Product> foundProducts = repository.findProductsByTariffId(tariffId);
-        for (Product product : foundProducts) {
-            product.setTariff(null);
-            product.setTariffVersion(null);
-        }
-    }
 }

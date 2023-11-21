@@ -5,13 +5,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.neoflex.tariffs.configuration.TopicNames;
+import ru.neoflex.tariffs.exceptions.BadRequestException;
 import ru.neoflex.tariffs.exceptions.DataNotFoundException;
 import ru.neoflex.tariffs.mappers.TariffMapper;
 import ru.neoflex.tariffs.models.entities.Tariff;
 import ru.neoflex.tariffs.models.requests.TariffRequest;
+import ru.neoflex.tariffs.models.responses.ProductResponse;
 import ru.neoflex.tariffs.models.responses.TariffMessage;
 import ru.neoflex.tariffs.models.responses.TariffResponse;
 import ru.neoflex.tariffs.repositories.TariffRepository;
+import ru.neoflex.tariffs.webclient.ProductClient;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,6 +23,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @Slf4j
 public class TariffsService {
+
+    private final ProductClient productClient;
 
     private final KafkaService kafkaService;
 
@@ -63,19 +68,21 @@ public class TariffsService {
         log.info("The tariff: {} has been updated", foundTariff);
         Tariff savedTariff = repository.save(foundTariff);
         kafkaService.sendMessage(TopicNames.TARIFF_UPDATED.name(),
-                                 TariffMessage.builder()
-                                              .tariffId(savedTariff.getId())
-                                              .tariffVersion(savedTariff.getVersion() + 1)
-                                              .build());
+                TariffMessage.builder()
+                             .tariffId(savedTariff.getId())
+                             .tariffVersion(savedTariff.getVersion() + 1)
+                             .build());
     }
 
     public void deleteTariffById(String id) {
+        List<ProductResponse> foundProductList = productClient.getProductsByTariffId(id);
+        if (!foundProductList.isEmpty()) {
+            throw new BadRequestException(String.format("There are products that refer to a tariff with an id=%s", id));
+        }
+
         Tariff foundTariff = findTariffById(id);
         repository.delete(foundTariff);
         log.info("The tariff with id={} has been deleted", id);
-        kafkaService.sendMessage(TopicNames.TARIFF_DELETED.name(), TariffMessage.builder()
-                                                                                .tariffId(UUID.fromString(id))
-                                                                                .build());
     }
 
     private Tariff findTariffById(String id) {

@@ -1,16 +1,16 @@
 --liquibase formatted sql
 
---changeset admin:7
+--changeset admin:8
 create schema if not exists products_app;
 create table if not exists products_app.product
 (
     id              uuid not null primary key,
-    name            varchar(255),
-    type            varchar(4) check (type = 'LOAN' or type = 'CARD'),
+    name            varchar(255) not null,
+    type            varchar(4) check (type = 'LOAN' or type = 'CARD') not null,
     start_date      timestamp(6),
     end_date        timestamp(6),
     description     text,
-    tariff          uuid,
+    tariff          uuid not null,
     author          uuid,
     product_version bigint,
     tariff_version  bigint

@@ -10,4 +10,6 @@
     <include file="users-schema.sql"/>
     <include file="tariffs-schema.sql"/>
     <include file="products-schema.sql"/>
+    <include file="tariffs-insert.sql"/>
+    <include file="products-insert.sql"/>
 </databaseChangeLog>

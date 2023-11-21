@@ -16,14 +16,9 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GatewayService {
-
-    @Value("${products.client.base-url}")
-    private String param;
+public class ProductGatewayService {
 
     private final ProductClient productClient;
-
-    private final TariffsClient tariffsClient;
 
     public ProductResponse getCurrentVersionOfProductById(String id) {
         ProductResponse currentVersionOfProductById = productClient.getCurrentVersionOfProductById(id);
@@ -53,23 +48,13 @@ public class GatewayService {
         productClient.rollBackProductVersion(id);
     }
 
+    public void updateProduct(String id, ProductRequest request) {
+        log.info("Request to update for product with id={}", id);
+        productClient.updateProduct(id, request);
+    }
+
     public void deleteProductById(String id) {
         log.info("Request to delete for product with id={}", id);
         productClient.deleteProduct(id);
-    }
-
-    public void createTariff(TariffRequest request) {
-        log.info("Request to save: {}", request);
-        tariffsClient.createTariff(request);
-    }
-
-    public void updateTariff(String id, TariffRequest request) {
-        log.info("Request to update: {} for tariff with id={}", request, id);
-        tariffsClient.updateTariff(id, request);
-    }
-
-    public void deleteTariffById(String id) {
-        log.info("Request to delete for tariff with id={}", id);
-        tariffsClient.deleteTariff(id);
     }
 }

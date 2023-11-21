@@ -21,8 +21,26 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@Validated
 public interface ProductController {
+
+    @Operation(summary = "Get the products by tariff id")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "The product were successfully received",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            array = @ArraySchema(
+                                    schema = @Schema(implementation = ProductResponse.class)
+                            )
+                    )
+            )
+    })
+    @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
+    List<ProductResponse> getProductsByTariffId(
+            @Parameter(in = ParameterIn.QUERY,
+                    required = true)
+            @RequestParam(value = "tariff") String tariffId);
 
     @Operation(summary = "Get the current version of product")
     @ApiResponses(value = {
@@ -43,7 +61,7 @@ public interface ProductController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getCurrentVersionOfProductById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
@@ -70,7 +88,7 @@ public interface ProductController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/previous", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ProductResponse> getPreviousVersionsOfProductById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
@@ -95,7 +113,7 @@ public interface ProductController {
                     )
             )
     })
-    @GetMapping(value = "/{id}/period", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/{id}/versions/period", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getVersionsOfProductForCertainPeriodById(
             @Parameter(in = ParameterIn.PATH,
                     required = true)
@@ -148,7 +166,7 @@ public interface ProductController {
                     required = true)
             @PathVariable(value = "id") String id);
 
-    @Operation(summary = "Update a product version")
+    @Operation(summary = "Update a product")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",

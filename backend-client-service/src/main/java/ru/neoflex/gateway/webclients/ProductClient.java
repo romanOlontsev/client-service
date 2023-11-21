@@ -31,6 +31,9 @@ public interface ProductClient {
     @PutMapping(value = "/{id}/rollback")
     void rollBackProductVersion(@PathVariable(value = "id") String id);
 
+    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    void updateProduct(@PathVariable(value = "id") String id, @RequestBody ProductRequest request);
+
     @DeleteMapping("/{id}")
     void deleteProduct(@PathVariable(value = "id") String id);
 

@@ -4,6 +4,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.neoflex.products.exceptions.BadRequestException;
 import ru.neoflex.products.exceptions.DataNotFoundException;
 import ru.neoflex.products.mappers.ProductMapper;
 import ru.neoflex.products.models.entities.Product;
@@ -29,13 +30,17 @@ public class ProductService {
 
     private final TariffsClient tariffsClient;
 
+    public List<ProductResponse> getProductsByTariffId(String tariffId) {
+        List<Product> foundProductList = repository.findProductsByTariffId(UUID.fromString(tariffId));
+        log.info("The product with tariff id={} has been received: {}", tariffId, foundProductList);
+        return mapper.productResponseListFromProductList(foundProductList);
+    }
+
     public ProductResponse getCurrentVersionOfProductById(String id) {
         Product foundProduct = findProductById(id);
         ProductResponse productResponse = mapper.productResponseFromProduct(foundProduct);
-        if (foundProduct.getTariff() != null) {
-            TariffResponse tariffResponse = getTariffByIdIfExists(foundProduct.getTariff());
-            productResponse.setTariff(tariffResponse);
-        }
+        TariffResponse tariffResponse = tariffsClient.getCurrentVersionOfTariffById(String.valueOf(foundProduct.getTariff()));
+        productResponse.setTariff(tariffResponse);
         log.info("The current version of the product: {} has been received", productResponse);
         return productResponse;
     }
@@ -66,7 +71,10 @@ public class ProductService {
 
     public void createProduct(ProductRequest request) {
         Product product = mapper.productFromProductRequest(request);
-        setTariffForProductByIdIfExists(product, request);
+        UUID tariffId = request.getTariff();
+        TariffResponse foundTariff = tariffsClient.getCurrentVersionOfTariffById(String.valueOf(tariffId));
+        product.setTariff(tariffId);
+        product.setTariffVersion(foundTariff.getVersion());
         Product savedProduct = repository.save(product);
         log.info("The product: {} has been saved", savedProduct);
     }
@@ -84,8 +92,13 @@ public class ProductService {
     @Transactional
     public void updateProduct(String id, ProductRequest request) {
         Product foundProject = findProductById(id);
-        setTariffForProductByIdIfExists(foundProject, request);
         mapper.updateProductFromProductRequest(foundProject, request);
+        if (request.getTariff() != null) {
+            UUID tariffId = request.getTariff();
+            TariffResponse foundTariff = tariffsClient.getCurrentVersionOfTariffById(String.valueOf(tariffId));
+            foundProject.setTariff(tariffId);
+            foundProject.setTariffVersion(foundTariff.getVersion());
+        }
         log.info("The product: {} has been updated", foundProject);
     }
 
@@ -101,24 +114,9 @@ public class ProductService {
                                  String.format("Product with id=%s not found", id)));
     }
 
-    private TariffResponse getTariffByIdIfExists(UUID tariffId) {
-        return tariffsClient.getCurrentVersionOfTariffById(tariffId.toString());
-    }
-
     private void setTariffForProductByIdAndVersionIfExists(Product foundProduct, ProductResponse productResponse) {
-        if (foundProduct.getTariff() != null) {
-            TariffResponse tariffResponse = tariffsClient.getTariffByIdAndVersion(
-                    String.valueOf(foundProduct.getTariff()), foundProduct.getTariffVersion());
-            productResponse.setTariff(tariffResponse);
-        }
-    }
-
-    private void setTariffForProductByIdIfExists(Product product, ProductRequest request) {
-        if (product.getTariff() == null && request.getTariff() != null) {
-            UUID tariffId = request.getTariff();
-            TariffResponse foundTariff = getTariffByIdIfExists(tariffId);
-            product.setTariff(tariffId);
-            product.setTariffVersion(foundTariff.getVersion());
-        }
+        TariffResponse tariffResponse = tariffsClient.getTariffByIdAndVersion(
+                String.valueOf(foundProduct.getTariff()), foundProduct.getTariffVersion());
+        productResponse.setTariff(tariffResponse);
     }
 }

@@ -29,10 +29,4 @@ public class KafkaTopicConfiguration {
         return TopicBuilder.name(TopicNames.TARIFF_UPDATED.name())
                            .build();
     }
-
-    @Bean
-    public NewTopic tariffDeleteTopic() {
-        return TopicBuilder.name(TopicNames.TARIFF_DELETED.name())
-                           .build();
-    }
 }

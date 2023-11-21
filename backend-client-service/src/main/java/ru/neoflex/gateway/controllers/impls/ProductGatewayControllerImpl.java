@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.neoflex.gateway.controllers.ProductGatewayController;
 import ru.neoflex.gateway.models.requests.ProductRequest;
 import ru.neoflex.gateway.models.responses.ProductResponse;
-import ru.neoflex.gateway.services.GatewayService;
+import ru.neoflex.gateway.services.ProductGatewayService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class ProductGatewayControllerImpl implements ProductGatewayController {
 
-    private final GatewayService service;
+    private final ProductGatewayService service;
 
     @Override
     public ProductResponse getCurrentVersionOfProductById(String id) {
@@ -41,6 +41,11 @@ public class ProductGatewayControllerImpl implements ProductGatewayController {
     @Override
     public void rollBackProductVersion(String id) {
         service.rollBackProductVersionById(id);
+    }
+
+    @Override
+    public void updateProduct(String id, ProductRequest request) {
+        service.updateProduct(id, request);
     }
 
     @Override

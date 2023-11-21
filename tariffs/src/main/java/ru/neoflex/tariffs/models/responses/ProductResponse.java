@@ -1,27 +1,26 @@
-package ru.neoflex.gateway.models.requests;
+package ru.neoflex.tariffs.models.responses;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import ru.neoflex.gateway.validation.ProductTypeConstraint;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
+@Setter
 @AllArgsConstructor
 @Builder
 @ToString
 @EqualsAndHashCode
-public class ProductRequest {
+public class ProductResponse {
+
+    @JsonProperty(value = "id")
+    private UUID id;
 
     @JsonProperty(value = "name")
-    @NotBlank
     private String name;
 
     @JsonProperty(value = "type")
-    @ProductTypeConstraint
     private String type;
 
     @JsonProperty(value = "start_date")
@@ -34,10 +33,11 @@ public class ProductRequest {
     private String description;
 
     @JsonProperty(value = "tariff")
-    @NotNull
-    private UUID tariff;
+    private TariffResponse tariff;
 
     @JsonProperty(value = "author")
     private UUID author;
 
+    @JsonProperty(value = "product_version")
+    private Long productVersion;
 }

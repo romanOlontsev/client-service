@@ -17,6 +17,11 @@ public class ProductControllerImpl implements ProductController {
     private final ProductService service;
 
     @Override
+    public List<ProductResponse> getProductsByTariffId(String tariffId) {
+        return service.getProductsByTariffId(tariffId);
+    }
+
+    @Override
     public ProductResponse getCurrentVersionOfProductById(String id) {
         return service.getCurrentVersionOfProductById(id);
     }

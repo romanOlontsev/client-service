@@ -125,7 +125,7 @@ public interface TariffsController {
             @RequestBody TariffRequest request);
 
 
-    @Operation(summary = "Update a tariff version")
+    @Operation(summary = "Update a tariff")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",

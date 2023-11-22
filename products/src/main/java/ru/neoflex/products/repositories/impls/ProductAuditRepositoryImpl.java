@@ -33,6 +33,7 @@ public class ProductAuditRepositoryImpl implements ProductAuditRepository {
         return resultList.stream()
                          .filter(Product.class::isInstance)
                          .map(Product.class::cast)
+                         .skip(1)
                          .collect(Collectors.toList());
     }
 

@@ -1,4 +1,4 @@
-package ru.neoflex.tariffs.configuration;
+package ru.neoflex.products.configuration;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

@@ -1,0 +1,9 @@
+{
+  "id": "5d033d70-712e-4bb9-abae-ba63f87a0b98",
+  "name": "tariff_2",
+  "start_date": "2023-10-21T12:40:40",
+  "end_date": "2023-10-22T12:40:40",
+  "description": "description_2",
+  "rate": 456.654,
+  "version": 1
+}

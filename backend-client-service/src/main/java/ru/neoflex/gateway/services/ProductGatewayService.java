@@ -2,13 +2,10 @@ package ru.neoflex.gateway.services;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import ru.neoflex.gateway.models.requests.ProductRequest;
-import ru.neoflex.gateway.models.requests.TariffRequest;
 import ru.neoflex.gateway.models.responses.ProductResponse;
 import ru.neoflex.gateway.webclients.ProductClient;
-import ru.neoflex.gateway.webclients.TariffsClient;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -16,7 +13,8 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductGatewayService {
+public class
+ProductGatewayService {
 
     private final ProductClient productClient;
 

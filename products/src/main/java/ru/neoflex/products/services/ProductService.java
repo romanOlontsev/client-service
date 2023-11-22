@@ -4,7 +4,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.neoflex.products.exceptions.BadRequestException;
 import ru.neoflex.products.exceptions.DataNotFoundException;
 import ru.neoflex.products.mappers.ProductMapper;
 import ru.neoflex.products.models.entities.Product;

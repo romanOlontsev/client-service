@@ -1,4 +1,4 @@
-package ru.neoflex.tariffs.webclient;
+package ru.neoflex.tariffs.webclients;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;

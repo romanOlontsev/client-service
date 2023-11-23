@@ -14,7 +14,7 @@ import ru.neoflex.tariffs.models.responses.ProductResponse;
 import ru.neoflex.tariffs.models.responses.TariffMessage;
 import ru.neoflex.tariffs.models.responses.TariffResponse;
 import ru.neoflex.tariffs.repositories.TariffRepository;
-import ru.neoflex.tariffs.webclient.ProductClient;
+import ru.neoflex.tariffs.webclients.ProductClient;
 
 import java.util.List;
 import java.util.UUID;

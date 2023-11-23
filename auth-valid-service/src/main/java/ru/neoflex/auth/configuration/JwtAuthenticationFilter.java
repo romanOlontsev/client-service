@@ -14,7 +14,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
-import ru.neoflex.auth.services.security.CustomUserService;
+import ru.neoflex.auth.services.security.CustomUserDetailsService;
 import ru.neoflex.auth.services.security.JwtService;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-    private final CustomUserService userService;
+    private final CustomUserDetailsService userService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         userLogin = jwtService.extractUserName(jwt);
         if (StringUtils.isNotEmpty(userLogin) && SecurityContextHolder.getContext()
                                                                       .getAuthentication() == null) {
-            UserDetails userDetails = userService.userDetailsService()
+            UserDetails userDetails = userService.getUserDetailsService()
                                                  .loadUserByUsername(userLogin);
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 SecurityContext context = SecurityContextHolder.createEmptyContext();

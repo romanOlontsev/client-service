@@ -7,14 +7,18 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import ru.neoflex.auth.models.requests.SigninRequest;
 import ru.neoflex.auth.models.requests.SignupRequest;
 import ru.neoflex.auth.models.responses.ApiErrorResponse;
 import ru.neoflex.auth.models.responses.JwtAuthenticationResponse;
+import ru.neoflex.auth.models.responses.TokenStatusResponse;
 
-@RequestMapping("api/auth")
+@RequestMapping("/api/auth")
 @SecurityRequirement(name = "Bearer Authentication")
 public interface AuthController {
 
@@ -47,4 +51,19 @@ public interface AuthController {
     })
     @PostMapping("/signin")
     JwtAuthenticationResponse signin(@RequestBody SigninRequest request);
+
+
+    @Operation(summary = "Get token status")
+    @ApiResponses(value = {
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Token status was successfully received",
+                    content = @Content(
+                            mediaType = MediaType.APPLICATION_JSON_VALUE,
+                            schema = @Schema(implementation = TokenStatusResponse.class)
+                    )
+            )
+    })
+    @GetMapping(value = "/token/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    TokenStatusResponse getTokenStatus(HttpServletRequest request);
 }

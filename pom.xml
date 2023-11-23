@@ -21,6 +21,7 @@
         <module>products</module>
         <module>tariffs</module>
         <module>backend-client-service</module>
+        <module>auth-valid-service</module>
     </modules>
 
     <properties>
@@ -33,6 +34,7 @@
         <spring-cloud-dependencies.version>2022.0.4</spring-cloud-dependencies.version>
         <wiremock.version>3.0.1</wiremock.version>
         <wiremock-spring-boot.version>2.0.0</wiremock-spring-boot.version>
+        <jjwt-api.version>0.11.5</jjwt-api.version>
     </properties>
 
     <dependencyManagement>

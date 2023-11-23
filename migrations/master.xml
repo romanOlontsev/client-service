@@ -12,4 +12,5 @@
     <include file="products-schema.sql"/>
     <include file="tariffs-insert.sql"/>
     <include file="products-insert.sql"/>
+    <include file="accounts-schema.sql"/>
 </databaseChangeLog>

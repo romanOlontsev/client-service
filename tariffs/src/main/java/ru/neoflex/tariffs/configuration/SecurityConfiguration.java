@@ -26,13 +26,12 @@ import java.util.List;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
-@EnableScheduling
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final CustomUserService userService;
+//    private final CustomUserService userService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -46,39 +45,41 @@ public class SecurityConfiguration {
                                                      .requestMatchers("/v3/api-docs/**")
                                                      .permitAll()
 
+
+
                                                      .anyRequest()
                                                      .authenticated())
 
             .sessionManagement(manager -> manager.sessionCreationPolicy(STATELESS))
-            .authenticationProvider(authenticationProvider())
+//            .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
-    @Bean
-    public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedHeader("*");
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
-    }
+//    @Bean
+//    public CorsConfigurationSource corsConfigurationSource() {
+//        CorsConfiguration configuration = new CorsConfiguration();
+//        configuration.setAllowedOrigins(List.of("http://localhost:3000"));
+//        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+//        configuration.setAllowCredentials(true);
+//        configuration.addAllowedHeader("*");
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", configuration);
+//        return source;
+//    }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+//    @Bean
+//    public PasswordEncoder passwordEncoder() {
+//        return new BCryptPasswordEncoder();
+//    }
 
-    @Bean
-    public AuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService.userDetailsService());
-        authProvider.setPasswordEncoder(passwordEncoder());
-        return authProvider;
-    }
+//    @Bean
+//    public AuthenticationProvider authenticationProvider() {
+//        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+//        authProvider.setUserDetailsService(userService.userDetailsService());
+//        authProvider.setPasswordEncoder(passwordEncoder());
+//        return authProvider;
+//    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

@@ -1,8 +1,10 @@
 package ru.neoflex.auth.handlers;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.session.SessionAuthenticationException;
 import org.springframework.security.web.csrf.InvalidCsrfTokenException;
 import org.springframework.security.web.csrf.MissingCsrfTokenException;
@@ -10,10 +12,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import ru.neoflex.auth.exceptions.BadRequestException;
-import ru.neoflex.auth.exceptions.DataAlreadyExistsException;
-import ru.neoflex.auth.exceptions.DataNotFoundException;
-import ru.neoflex.auth.exceptions.ForbiddenException;
+import ru.neoflex.auth.exceptions.*;
 import ru.neoflex.auth.models.responses.ApiErrorResponse;
 
 import java.util.stream.Collectors;
@@ -42,6 +41,9 @@ public class CustomExceptionHandler {
     }
 
     @ExceptionHandler({
+            UsernameNotFoundException.class,
+            ExpiredJwtException.class,
+            InvalidTokenException.class,
             AuthenticationException.class,
             MissingCsrfTokenException.class,
             InvalidCsrfTokenException.class,

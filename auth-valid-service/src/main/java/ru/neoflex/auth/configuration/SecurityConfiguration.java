@@ -26,7 +26,6 @@ import java.util.Arrays;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
-@EnableScheduling
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
@@ -38,11 +37,9 @@ public class SecurityConfiguration {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .cors(Customizer.withDefaults())
-            .authorizeHttpRequests(request -> request.requestMatchers("/api/auth/signup")
+            .authorizeHttpRequests(request -> request.requestMatchers("/api/auth/**")
                                                      .permitAll()
 
-                                                     .requestMatchers("/api/auth/signin")
-                                                     .permitAll()
 //TODO DELETE
                                                      .requestMatchers("/swagger-ui/**")
                                                      .permitAll()
@@ -61,7 +58,7 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000", "https://neo-oct-nodevops-12820.nh2023.codenrock.com"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3211"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowCredentials(true);
         configuration.addAllowedHeader("*");

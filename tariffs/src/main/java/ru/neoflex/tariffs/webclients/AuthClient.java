@@ -1,14 +1,14 @@
 package ru.neoflex.tariffs.webclients;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import ru.neoflex.tariffs.models.responses.TokenStatusResponse;
+import org.springframework.web.bind.annotation.RequestParam;
+import ru.neoflex.tariffs.models.responses.UserDetailsResponse;
 
 @FeignClient(value = "auth", url = "${auth.client.base-url}")
 public interface AuthClient {
 
-    @GetMapping(value = "/token/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    TokenStatusResponse getTokenStatus(HttpServletRequest request);
+    @GetMapping(value = "/api/auth/details", produces = MediaType.APPLICATION_JSON_VALUE)
+    UserDetailsResponse getUserDetails(@RequestParam("token") String token);
 }

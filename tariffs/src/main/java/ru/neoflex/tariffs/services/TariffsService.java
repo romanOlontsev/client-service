@@ -68,10 +68,10 @@ public class TariffsService {
         log.info("The tariff: {} has been updated", foundTariff);
         Tariff savedTariff = repository.save(foundTariff);
         kafkaService.sendMessage(TopicNames.TARIFF_UPDATED.name(),
-                TariffMessage.builder()
-                             .tariffId(savedTariff.getId())
-                             .tariffVersion(savedTariff.getVersion() + 1)
-                             .build());
+                                 TariffMessage.builder()
+                                              .tariffId(savedTariff.getId())
+                                              .tariffVersion(savedTariff.getVersion() + 1)
+                                              .build());
     }
 
     public void deleteTariffById(String id) {

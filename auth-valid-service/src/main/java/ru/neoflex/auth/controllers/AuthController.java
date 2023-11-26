@@ -10,8 +10,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import ru.neoflex.auth.models.requests.SigninRequest;
 import ru.neoflex.auth.models.requests.SignupRequest;
 import ru.neoflex.auth.models.responses.ApiErrorResponse;
@@ -61,8 +61,16 @@ public interface AuthController {
                     description = "Token is valid",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = UserDetailsResponse.class)))
+                            schema = @Schema(implementation = UserDetailsResponse.class))),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Address not registered",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = ApiErrorResponse.class))),
     })
     @GetMapping(value = "/token/status", produces = MediaType.APPLICATION_JSON_VALUE)
-    TokenStatusResponse checkTokenForValidity(@RequestParam("token") String token);
+    TokenStatusResponse checkTokenForValidity(
+            @RequestHeader("Token") String token,
+            @RequestHeader("Service-Address") String address);
 }

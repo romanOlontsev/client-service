@@ -8,7 +8,6 @@ import ru.neoflex.auth.models.requests.SigninRequest;
 import ru.neoflex.auth.models.requests.SignupRequest;
 import ru.neoflex.auth.models.responses.JwtAuthenticationResponse;
 import ru.neoflex.auth.models.responses.TokenStatusResponse;
-import ru.neoflex.auth.models.responses.UserDetailsResponse;
 import ru.neoflex.auth.services.security.AuthenticationService;
 
 @RestController
@@ -28,7 +27,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public TokenStatusResponse checkTokenForValidity(String token) {
-        return authenticationService.getUserDetailsIfValidToken(token);
+    public TokenStatusResponse checkTokenForValidity(String token, String address) {
+        return authenticationService.checkTokenForValidity(token, address);
     }
 }

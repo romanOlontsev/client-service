@@ -49,7 +49,7 @@ class HeaderValidationServiceTest {
         assertAll(
                 () -> assertThat(service.getHeaderValidationByHeader(header)).isNotNull()
                                                                              .isEqualTo(expected)
-        );
+                 );
     }
 
     @Test
@@ -62,7 +62,7 @@ class HeaderValidationServiceTest {
                 () -> assertThatThrownBy(() -> service.getHeaderValidationByHeader(header))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Header: %s not supported", header))
-        );
+                 );
     }
 
     @Test
@@ -83,7 +83,7 @@ class HeaderValidationServiceTest {
                 () -> assertThat(response).isNotNull()
                                           .isEqualTo(expectedList),
                 () -> verify(repository, times(1)).findAllHeaderValidation()
-        );
+                 );
     }
 
     @Test
@@ -103,7 +103,7 @@ class HeaderValidationServiceTest {
         assertAll(
                 () -> verify(repository, times(1)).findHeaderValidationByHeader(any()),
                 () -> verify(repository, times(1)).save(any())
-        );
+                 );
     }
 
     @Test
@@ -124,7 +124,7 @@ class HeaderValidationServiceTest {
                 () -> assertThatThrownBy(() -> service.addHeaderValidation(request))
                         .isInstanceOf(DataAlreadyExistsException.class)
                         .hasMessage(String.format("Header %s already exists", request.getHeaderName()))
-        );
+                 );
     }
 
     @Test
@@ -140,7 +140,7 @@ class HeaderValidationServiceTest {
                 () -> assertThatThrownBy(() -> service.addHeaderValidation(request))
                         .isInstanceOf(BadRequestException.class)
                         .hasMessage("Request contains unknown fields for validation")
-        );
+                 );
     }
 
     @Test
@@ -159,7 +159,7 @@ class HeaderValidationServiceTest {
         service.updateHeaderValidation(request);
         assertAll(
                 () -> verify(repository, times(1)).findHeaderValidationByHeader(any())
-        );
+                 );
 
 
     }
@@ -182,6 +182,6 @@ class HeaderValidationServiceTest {
         service.deleteHeaderValidation(request.getHeaderName());
         assertAll(
                 () -> verify(repository, times(1)).deleteByHeader(any())
-        );
+                 );
     }
 }

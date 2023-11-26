@@ -1,5 +1,6 @@
 package ru.neoflex.gateway.controllers.impls;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import ru.neoflex.gateway.controllers.TariffGatewayController;
@@ -16,32 +17,32 @@ public class TariffGatewayControllerImpl implements TariffGatewayController {
     private final TariffGatewayService service;
 
     @Override
-    public TariffResponse getCurrentVersionOfTariffById(String id) {
-        return service.getCurrentVersionOfTariffById(id);
+    public TariffResponse getCurrentVersionOfTariffById(HttpServletRequest httpRequest, String id) {
+        return service.getCurrentVersionOfTariffById(httpRequest, id);
     }
 
     @Override
-    public TariffResponse getTariffByIdAndVersion(String id, Long version) {
-        return service.getTariffByIdAndVersion(id, version);
+    public TariffResponse getTariffByIdAndVersion(HttpServletRequest httpRequest, String id, Long version) {
+        return service.getTariffByIdAndVersion(httpRequest, id, version);
     }
 
     @Override
-    public List<TariffResponse> getPreviousVersionsOfTariffById(String id) {
-        return service.getPreviousVersionsOfTariffById(id);
+    public List<TariffResponse> getPreviousVersionsOfTariffById(HttpServletRequest httpRequest, String id) {
+        return service.getPreviousVersionsOfTariffById(httpRequest, id);
     }
 
     @Override
-    public void createTariff(TariffRequest request) {
-        service.createTariff(request);
+    public void createTariff(HttpServletRequest httpRequest, TariffRequest request) {
+        service.createTariff(httpRequest, request);
     }
 
     @Override
-    public void updateTariff(String id, TariffRequest request) {
-        service.updateTariff(id, request);
+    public void updateTariff(HttpServletRequest httpRequest, String id, TariffRequest request) {
+        service.updateTariff(httpRequest, id, request);
     }
 
     @Override
-    public void deleteTariff(String id) {
-        service.deleteTariffById(id);
+    public void deleteTariff(HttpServletRequest httpRequest, String id) {
+        service.deleteTariffById(httpRequest, id);
     }
 }

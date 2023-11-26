@@ -1,5 +1,6 @@
 package ru.neoflex.products.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,22 +36,24 @@ public class ProductService {
         return mapper.productResponseListFromProductList(foundProductList);
     }
 
-    public ProductResponse getCurrentVersionOfProductById(String id) {
+    public ProductResponse getCurrentVersionOfProductById(HttpServletRequest httpRequest, String id) {
         Product foundProduct = findProductById(id);
+        String token = getAuthorizationHeaderFromRequest(httpRequest);
         ProductResponse productResponse = mapper.productResponseFromProduct(foundProduct);
-        TariffResponse tariffResponse = tariffsClient.getCurrentVersionOfTariffById(String.valueOf(foundProduct.getTariff()));
+        TariffResponse tariffResponse = tariffsClient.getCurrentVersionOfTariffById(token, String.valueOf(foundProduct.getTariff()));
         productResponse.setTariff(tariffResponse);
         log.info("The current version of the product: {} has been received", productResponse);
         return productResponse;
     }
 
     @Transactional
-    public List<ProductResponse> getPreviousVersionsOfProductById(String id) {
+    public List<ProductResponse> getPreviousVersionsOfProductById(HttpServletRequest httpRequest, String id) {
         List<Product> previousVersions = repository.findPreviousVersionsOfProductById(UUID.fromString(id));
+        String token = getAuthorizationHeaderFromRequest(httpRequest);
         List<ProductResponse> responseList = new ArrayList<>();
         for (Product product : previousVersions) {
             ProductResponse productResponse = mapper.productResponseFromProduct(product);
-            setTariffForProductByIdAndVersionIfExists(product, productResponse);
+            setTariffForProductByIdAndVersionIfExists(token, product, productResponse);
             responseList.add(productResponse);
         }
         log.info("Previous versions of the product: {} were received", responseList);
@@ -58,20 +61,22 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse getVersionOfProductForCertainPeriodById(String id, LocalDateTime dateTime) {
+    public ProductResponse getVersionOfProductForCertainPeriodById(HttpServletRequest httpRequest, String id, LocalDateTime dateTime) {
         Product foundProduct = repository.findVersionOfProductForCertainPeriodById(UUID.fromString(id), dateTime)
                                          .orElseThrow(() -> new DataNotFoundException(
                                                  String.format("Version for product with id=%s for period %s not found", id, dateTime)));
+        String token = getAuthorizationHeaderFromRequest(httpRequest);
         ProductResponse productResponse = mapper.productResponseFromProduct(foundProduct);
-        setTariffForProductByIdAndVersionIfExists(foundProduct, productResponse);
+        setTariffForProductByIdAndVersionIfExists(token, foundProduct, productResponse);
         log.info("Product version for the {} period: {} has been received", dateTime, productResponse);
         return productResponse;
     }
 
-    public void createProduct(ProductRequest request) {
-        Product product = mapper.productFromProductRequest(request);
-        UUID tariffId = request.getTariff();
-        TariffResponse foundTariff = tariffsClient.getCurrentVersionOfTariffById(String.valueOf(tariffId));
+    public void createProduct(HttpServletRequest httpRequest, ProductRequest productRequest) {
+        Product product = mapper.productFromProductRequest(productRequest);
+        UUID tariffId = productRequest.getTariff();
+        String token = getAuthorizationHeaderFromRequest(httpRequest);
+        TariffResponse foundTariff = tariffsClient.getCurrentVersionOfTariffById(token, String.valueOf(tariffId));
         product.setTariff(tariffId);
         product.setTariffVersion(foundTariff.getVersion());
         Product savedProduct = repository.save(product);
@@ -89,12 +94,13 @@ public class ProductService {
     }
 
     @Transactional
-    public void updateProduct(String id, ProductRequest request) {
+    public void updateProduct(HttpServletRequest httpRequest, String id, ProductRequest request) {
         Product foundProject = findProductById(id);
+        String token = getAuthorizationHeaderFromRequest(httpRequest);
         mapper.updateProductFromProductRequest(foundProject, request);
         if (request.getTariff() != null) {
             UUID tariffId = request.getTariff();
-            TariffResponse foundTariff = tariffsClient.getCurrentVersionOfTariffById(String.valueOf(tariffId));
+            TariffResponse foundTariff = tariffsClient.getCurrentVersionOfTariffById(token, String.valueOf(tariffId));
             foundProject.setTariff(tariffId);
             foundProject.setTariffVersion(foundTariff.getVersion());
         }
@@ -113,9 +119,13 @@ public class ProductService {
                                  String.format("Product with id=%s not found", id)));
     }
 
-    private void setTariffForProductByIdAndVersionIfExists(Product foundProduct, ProductResponse productResponse) {
+    private void setTariffForProductByIdAndVersionIfExists(String token, Product foundProduct, ProductResponse productResponse) {
         TariffResponse tariffResponse = tariffsClient.getTariffByIdAndVersion(
-                String.valueOf(foundProduct.getTariff()), foundProduct.getTariffVersion());
+                token, String.valueOf(foundProduct.getTariff()), foundProduct.getTariffVersion());
         productResponse.setTariff(tariffResponse);
+    }
+
+    private String getAuthorizationHeaderFromRequest(HttpServletRequest httpRequest) {
+        return httpRequest.getHeader("Authorization");
     }
 }

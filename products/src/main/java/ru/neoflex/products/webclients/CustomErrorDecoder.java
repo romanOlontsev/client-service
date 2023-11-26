@@ -6,9 +6,12 @@ import feign.Response;
 import feign.codec.ErrorDecoder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 import ru.neoflex.products.exceptions.BadRequestException;
+import ru.neoflex.products.exceptions.DataAlreadyExistsException;
 import ru.neoflex.products.exceptions.DataNotFoundException;
+import ru.neoflex.products.exceptions.ForbiddenException;
 import ru.neoflex.products.models.responses.ApiErrorResponse;
 
 import java.io.IOException;
@@ -38,7 +41,7 @@ public class CustomErrorDecoder implements ErrorDecoder {
             String result = getResponseBodyAsString(response.body());
             objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             ApiErrorResponse exceptionMessage = objectMapper.readValue(result,
-                    ApiErrorResponse.class);
+                                                                       ApiErrorResponse.class);
             message = exceptionMessage.getDescription();
         } catch (IOException e) {
             log.error("Failed to get body as reader: ", e);
@@ -52,7 +55,10 @@ public class CustomErrorDecoder implements ErrorDecoder {
         }
         switch (response.status()) {
             case 400 -> throw new BadRequestException(message);
+            case 401 -> throw new BadCredentialsException(message);
+            case 403 -> throw new ForbiddenException(message);
             case 404 -> throw new DataNotFoundException(message);
+            case 409 -> throw new DataAlreadyExistsException(message);
             default -> {
                 return errorDecoder.decode(s, response);
             }

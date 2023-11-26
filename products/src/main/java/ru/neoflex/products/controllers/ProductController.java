@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@SecurityRequirement(name = "Bearer Authentication")
 @RequestMapping("/api/products")
 public interface ProductController {
 
@@ -62,6 +65,7 @@ public interface ProductController {
     })
     @GetMapping(value = "/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getCurrentVersionOfProductById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
@@ -89,6 +93,7 @@ public interface ProductController {
     })
     @GetMapping(value = "/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ProductResponse> getPreviousVersionsOfProductById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
@@ -114,6 +119,7 @@ public interface ProductController {
     })
     @GetMapping(value = "/{id}/versions/period", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getVersionsOfProductForCertainPeriodById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id,
@@ -140,6 +146,7 @@ public interface ProductController {
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     void createProduct(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.DEFAULT,
                     schema = @Schema(implementation = ProductRequest.class))
             @RequestBody ProductRequest request);
@@ -182,6 +189,7 @@ public interface ProductController {
     })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     void updateProduct(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id,

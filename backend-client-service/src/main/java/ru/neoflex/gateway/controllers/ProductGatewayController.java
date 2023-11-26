@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
@@ -21,7 +23,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/product")
+@SecurityRequirement(name = "Bearer Authentication")
+@RequestMapping("/api/products")
 @Validated
 public interface ProductGatewayController {
 
@@ -46,6 +49,7 @@ public interface ProductGatewayController {
     })
     @GetMapping(value = "/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getCurrentVersionOfProductById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
@@ -73,6 +77,7 @@ public interface ProductGatewayController {
     })
     @GetMapping(value = "/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ProductResponse> getPreviousVersionsOfProductById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
@@ -98,6 +103,7 @@ public interface ProductGatewayController {
     })
     @GetMapping(value = "/{id}/versions/period", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getVersionsOfProductForCertainPeriodById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id,
@@ -125,6 +131,7 @@ public interface ProductGatewayController {
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     void createProduct(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.DEFAULT,
                     schema = @Schema(implementation = ProductRequest.class))
             @RequestBody @Valid ProductRequest request);
@@ -147,6 +154,7 @@ public interface ProductGatewayController {
     })
     @PutMapping(value = "/{id}/rollback")
     void rollBackProductVersion(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
@@ -169,6 +177,7 @@ public interface ProductGatewayController {
     })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     void updateProduct(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id,
@@ -193,6 +202,7 @@ public interface ProductGatewayController {
     })
     @DeleteMapping("/{id}")
     void deleteProduct(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);

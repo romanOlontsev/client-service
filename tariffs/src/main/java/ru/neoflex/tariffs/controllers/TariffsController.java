@@ -35,6 +35,10 @@ public interface TariffsController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "The tariff not found",
                     content = @Content(
@@ -58,6 +62,10 @@ public interface TariffsController {
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = TariffResponse.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -90,6 +98,10 @@ public interface TariffsController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "The tariff not found",
                     content = @Content(
@@ -110,6 +122,10 @@ public interface TariffsController {
             @ApiResponse(
                     responseCode = "200",
                     description = "The tariff was created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -134,6 +150,10 @@ public interface TariffsController {
                     description = "Update successful"
             ),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "The tariff not found",
                     content = @Content(
@@ -156,6 +176,10 @@ public interface TariffsController {
             @ApiResponse(
                     responseCode = "200",
                     description = "The tariff was deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
             ),
             @ApiResponse(
                     responseCode = "404",

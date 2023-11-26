@@ -3,11 +3,13 @@ package ru.neoflex.tariffs.handlers;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.neoflex.tariffs.exceptions.BadRequestException;
 import ru.neoflex.tariffs.exceptions.DataNotFoundException;
+import ru.neoflex.tariffs.exceptions.ForbiddenException;
 import ru.neoflex.tariffs.models.responses.ApiErrorResponse;
 
 import java.sql.SQLException;
@@ -45,6 +47,22 @@ public class CustomExceptionHandler {
         String message = e.getMessage();
         log.error(message);
         return getApiErrorResponse(e, "400", message);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiErrorResponse handle(BadCredentialsException e) {
+        String message = e.getMessage();
+        log.error(message);
+        return getApiErrorResponse(e, "401", message);
+    }
+
+    @ExceptionHandler(ForbiddenException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiErrorResponse handle(ForbiddenException e) {
+        String message = e.getMessage();
+        log.error(message);
+        return getApiErrorResponse(e, "403", message);
     }
 
     @ExceptionHandler(DataNotFoundException.class)

@@ -7,6 +7,7 @@ import ru.neoflex.auth.controllers.AuthController;
 import ru.neoflex.auth.models.requests.SigninRequest;
 import ru.neoflex.auth.models.requests.SignupRequest;
 import ru.neoflex.auth.models.responses.JwtAuthenticationResponse;
+import ru.neoflex.auth.models.responses.TokenStatusResponse;
 import ru.neoflex.auth.models.responses.UserDetailsResponse;
 import ru.neoflex.auth.services.security.AuthenticationService;
 
@@ -27,7 +28,7 @@ public class AuthControllerImpl implements AuthController {
     }
 
     @Override
-    public UserDetailsResponse getUserDetails(String token) {
+    public TokenStatusResponse checkTokenForValidity(String token) {
         return authenticationService.getUserDetailsIfValidToken(token);
     }
 }

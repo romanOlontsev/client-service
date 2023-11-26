@@ -16,6 +16,7 @@ import ru.neoflex.auth.models.requests.SigninRequest;
 import ru.neoflex.auth.models.requests.SignupRequest;
 import ru.neoflex.auth.models.responses.ApiErrorResponse;
 import ru.neoflex.auth.models.responses.JwtAuthenticationResponse;
+import ru.neoflex.auth.models.responses.TokenStatusResponse;
 import ru.neoflex.auth.models.responses.UserDetailsResponse;
 
 @RequestMapping("/api/auth")
@@ -53,21 +54,15 @@ public interface AuthController {
     JwtAuthenticationResponse signin(@RequestBody SigninRequest request);
 
 
-    @Operation(summary = "Get user details by token")
+    @Operation(summary = "Check token for validity")
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Token details was successfully received",
+                    description = "Token is valid",
                     content = @Content(
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = UserDetailsResponse.class))),
-            @ApiResponse(
-                    responseCode = "401",
-                    description = "Invalid token",
-                    content = @Content(
-                            mediaType = "application/json",
-                            schema = @Schema(implementation = ApiErrorResponse.class)))
+                            schema = @Schema(implementation = UserDetailsResponse.class)))
     })
-    @GetMapping(value = "/details", produces = MediaType.APPLICATION_JSON_VALUE)
-    UserDetailsResponse getUserDetails(@RequestParam("token") String token);
+    @GetMapping(value = "/token/status", produces = MediaType.APPLICATION_JSON_VALUE)
+    TokenStatusResponse checkTokenForValidity(@RequestParam("token") String token);
 }

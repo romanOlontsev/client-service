@@ -38,15 +38,16 @@ public class JwtServiceImpl implements JwtService {
         return (userName.equals(userDetails.getUsername())) && !isTokenExpired(token);
     }
 
+    @Override
+    public boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
+
     private String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                    .setIssuedAt(new Date(System.currentTimeMillis()))
                    .setExpiration(new Date(System.currentTimeMillis() + (1000 * 60 * 60)))
                    .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
-    }
-
-    private boolean isTokenExpired(String token) {
-        return extractExpiration(token).before(new Date());
     }
 
     private Date extractExpiration(String token) {

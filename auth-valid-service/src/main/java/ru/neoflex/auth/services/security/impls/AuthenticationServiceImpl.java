@@ -14,7 +14,9 @@ import ru.neoflex.auth.models.entity.User;
 import ru.neoflex.auth.models.requests.SigninRequest;
 import ru.neoflex.auth.models.requests.SignupRequest;
 import ru.neoflex.auth.models.responses.JwtAuthenticationResponse;
+import ru.neoflex.auth.models.responses.TokenStatusResponse;
 import ru.neoflex.auth.models.responses.UserDetailsResponse;
+import ru.neoflex.auth.models.responses.utils.TokenStatus;
 import ru.neoflex.auth.services.UserService;
 import ru.neoflex.auth.services.security.AuthenticationService;
 import ru.neoflex.auth.services.security.CustomUserDetailsService;
@@ -61,16 +63,14 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
-    public UserDetailsResponse getUserDetailsIfValidToken(String token) {
+    public TokenStatusResponse getUserDetailsIfValidToken(String token) {
         String userLogin = jwtService.extractUserName(token);
         if (StringUtils.isNotEmpty(userLogin) && SecurityContextHolder.getContext()
                                                                       .getAuthentication() != null) {
-            UserDetails userDetails = userDetailsService.getUserDetailsService()
-                                                        .loadUserByUsername(userLogin);
-            if (jwtService.isTokenValid(token, userDetails)) {
-                return mapper.userDetailsResponseFromUserDetails(userDetails);
+            if (!jwtService.isTokenExpired(token)) {
+                return new TokenStatusResponse(TokenStatus.VALID);
             }
         }
-        throw new InvalidTokenException("Invalid token");
+        return new TokenStatusResponse(TokenStatus.INVALID);
     }
 }

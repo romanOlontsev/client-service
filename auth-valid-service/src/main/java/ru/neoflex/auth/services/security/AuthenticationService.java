@@ -5,6 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import ru.neoflex.auth.models.requests.SigninRequest;
 import ru.neoflex.auth.models.requests.SignupRequest;
 import ru.neoflex.auth.models.responses.JwtAuthenticationResponse;
+import ru.neoflex.auth.models.responses.TokenStatusResponse;
 import ru.neoflex.auth.models.responses.UserDetailsResponse;
 
 public interface AuthenticationService {
@@ -12,5 +13,5 @@ public interface AuthenticationService {
 
     JwtAuthenticationResponse signin(SigninRequest request);
 
-    UserDetailsResponse getUserDetailsIfValidToken(String token);
+    TokenStatusResponse getUserDetailsIfValidToken(String token);
 }

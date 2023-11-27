@@ -73,10 +73,10 @@ class ProductServiceTest extends IntegrationEnvironment {
              Database database = DatabaseFactory.getInstance()
                                                 .findCorrectDatabaseImplementation(new JdbcConnection(connection))) {
             Liquibase liquibase = new liquibase.Liquibase("master.xml",
-                    new DirectoryResourceAccessor(new File("").toPath()
-                                                              .toAbsolutePath()
-                                                              .getParent()
-                                                              .resolve("migrations")), database
+                                                          new DirectoryResourceAccessor(new File("").toPath()
+                                                                                                    .toAbsolutePath()
+                                                                                                    .getParent()
+                                                                                                    .resolve("migrations")), database
             );
             liquibase.update(new Contexts(), new LabelExpression());
         } catch (LiquibaseException | SQLException | FileNotFoundException e) {
@@ -115,7 +115,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                                           .hasSize(1)
                                           .isEqualTo(expectedList)
 
-        );
+                 );
 
     }
 
@@ -151,7 +151,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThat(response).isNotNull()
                                           .isEqualTo(expected)
 
-        );
+                 );
     }
 
     @Test
@@ -164,7 +164,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThatThrownBy(() -> service.getCurrentVersionOfProductById(httpRequestMock, productId))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Product with id=%s not found", productId))
-        );
+                 );
     }
 
     @Test
@@ -203,7 +203,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                                           .hasSize(1)
                                           .isEqualTo(expectedList)
 
-        );
+                 );
     }
 
     @Test
@@ -240,7 +240,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThat(response).isNotNull()
                                           .isEqualTo(expected)
 
-        );
+                 );
     }
 
     @Test
@@ -254,7 +254,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThatThrownBy(() -> service.getVersionOfProductForCertainPeriodById(httpRequestMock, productId, localDateTime))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Version for product with id=%s for period %s not found", productId, localDateTime))
-        );
+                 );
     }
 
     @Test
@@ -278,7 +278,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                    .isEqualTo(request.getName()),
                 () -> assertThat(allTariffs.get(2)).extracting(Product::getType)
                                                    .isEqualTo(request.getType())
-        );
+                 );
     }
 
     @Test
@@ -310,7 +310,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThat(foundProduct).isNotNull()
                                               .extracting(Product::getTariffVersion)
                                               .isNotEqualTo(updated.getDescription())
-        );
+                 );
     }
 
     @Test
@@ -321,7 +321,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThatThrownBy(() -> service.rollBackProductVersionById(productId))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Previous version for product with id=%s not found", productId))
-        );
+                 );
     }
 
     @Test
@@ -359,7 +359,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThat(foundProduct).isNotNull()
                                               .extracting(Product::getTariff)
                                               .isEqualTo(updated.getTariff())
-        );
+                 );
     }
 
     @Test
@@ -375,6 +375,6 @@ class ProductServiceTest extends IntegrationEnvironment {
                                           .hasSize(1),
                 () -> assertThat(response.get(0)).extracting(Product::getId)
                                                  .isNotEqualTo(UUID.fromString(productId))
-        );
+                 );
     }
 }

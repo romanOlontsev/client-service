@@ -13,17 +13,17 @@ import java.util.List;
 @FeignClient(value = "products", url = "${products.client.base-url}", configuration = CustomErrorDecoder.class)
 public interface ProductClient {
 
-    @GetMapping(value = "/api/products/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/products/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getCurrentVersionOfProductById(
             @RequestHeader("Authorization") String token,
             @PathVariable(value = "id") String id);
 
-    @GetMapping(value = "/api/products/{id}/previous", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/products/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ProductResponse> getPreviousVersionsOfProductById(
             @RequestHeader("Authorization") String token,
             @PathVariable(value = "id") String id);
 
-    @GetMapping(value = "/api/products/{id}/period", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/products/{id}/versions/period", produces = MediaType.APPLICATION_JSON_VALUE)
     ProductResponse getVersionsOfProductForCertainPeriodById(
             @RequestHeader("Authorization") String token,
             @PathVariable(value = "id") String id,

@@ -9,7 +9,7 @@ import java.util.List;
 
 @Entity
 @DynamicInsert
-@Table(name = "header", schema = "users_app")
+@Table(name = "header", schema = "accounts_app")
 @Getter
 @Setter
 @Builder
@@ -27,7 +27,7 @@ public class HeaderValidation {
     private String headerName;
 
     @ElementCollection
-    @CollectionTable(name = "required_fields", schema = "users_app")
+    @CollectionTable(name = "required_fields", schema = "accounts_app")
     private List<String> requiredFields = new ArrayList<>();
 
 }

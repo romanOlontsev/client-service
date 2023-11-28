@@ -26,6 +26,8 @@ public class SecurityConfiguration {
                                                      .authenticated()
                                                      .requestMatchers("/api/tariffs/**")
                                                      .authenticated()
+                                                     .requestMatchers("/api/auth/**")
+                                                     .permitAll()
 //TODO DELETE
                                                      .requestMatchers("/swagger-ui/**")
                                                      .permitAll()

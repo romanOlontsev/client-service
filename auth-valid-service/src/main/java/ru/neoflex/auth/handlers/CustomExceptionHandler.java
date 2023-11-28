@@ -2,37 +2,30 @@ package ru.neoflex.auth.handlers;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import ru.neoflex.auth.exceptions.*;
 import ru.neoflex.auth.models.responses.ApiErrorResponse;
 
-import java.util.stream.Collectors;
-
 @Slf4j
 @RestControllerAdvice
-public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
+public class CustomExceptionHandler {
+//        extends ResponseEntityExceptionHandler {
 
-    @Override
-    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-        String message = ex.getFieldErrors()
-                           .stream()
-                           .map(it -> it.getField() + ": " + it.getDefaultMessage())
-                           .collect(Collectors.joining("; "));
-        ApiErrorResponse apiErrorResponse = getApiErrorResponse(ex, "400", message);
-        log.error(message);
-        return new ResponseEntity<>(apiErrorResponse, status);
-    }
+//    @Override
+//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+//        String message = ex.getFieldErrors()
+//                           .stream()
+//                           .map(it -> it.getField() + ": " + it.getDefaultMessage())
+//                           .collect(Collectors.joining("; "));
+//        ApiErrorResponse apiErrorResponse = getApiErrorResponse(ex, "400", message);
+//        log.error(message);
+//        return new ResponseEntity<>(apiErrorResponse, status);
+//    }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -42,21 +35,16 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         return getApiErrorResponse(e, "400", message);
     }
 
-    @ExceptionHandler({
-            UsernameNotFoundException.class,
-            ExpiredJwtException.class,
-            InvalidTokenException.class,
-            AuthenticationException.class})
-    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public ApiErrorResponse handle(RuntimeException e) {
+    @ExceptionHandler(UnregisteredAddressException.class)
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public ApiErrorResponse handle(UnregisteredAddressException e) {
         String message = e.getMessage();
         log.error(message);
-        return getApiErrorResponse(e, "401", message);
+        return getApiErrorResponse(e, "403", message);
     }
 
-    @ExceptionHandler({
-            UnregisteredAddressException.class,
-            ForbiddenException.class})
+    @ExceptionHandler(
+            ForbiddenException.class)
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ApiErrorResponse handle(ForbiddenException e) {
         String message = e.getMessage();
@@ -78,6 +66,18 @@ public class CustomExceptionHandler extends ResponseEntityExceptionHandler {
         String message = e.getMessage();
         log.error(message);
         return getApiErrorResponse(e, "409", message);
+    }
+
+    @ExceptionHandler({
+            UsernameNotFoundException.class,
+            ExpiredJwtException.class,
+            InvalidTokenException.class,
+            AuthenticationException.class})
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ApiErrorResponse handle(RuntimeException e) {
+        String message = e.getMessage();
+        log.error(message);
+        return getApiErrorResponse(e, "401", message);
     }
 
     private ApiErrorResponse getApiErrorResponse(Exception e, String code, String description) {

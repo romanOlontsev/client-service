@@ -1,6 +1,6 @@
 package ru.neoflex.auth.models.requests;
 
-import jakarta.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 @Getter
@@ -10,9 +10,9 @@ import lombok.*;
 @Builder
 public class SignupRequest {
 
-    @JoinColumn(name = "login")
+    @JsonProperty(value = "login")
     private String login;
 
-    @JoinColumn(name = "password")
+    @JsonProperty(value = "password")
     private String password;
 }

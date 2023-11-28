@@ -1,4 +1,4 @@
-package ru.neoflex.auth.models.requests;
+package ru.neoflex.gateway.models.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;

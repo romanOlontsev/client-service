@@ -50,11 +50,21 @@ services:
     environment:
       KAFKA_BROKER_ID: 1
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      #      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://kafka:29092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://kafka:29092
+#      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - backend
+
+  auth-service:
+    depends_on:
+      - postgresql
+      - liquibase-migrations
+    build: auth-valid-service/.
+    environment:
+      - spring_datasource_url=jdbc:postgresql://postgresql:5432/client_db
     networks:
       - backend
 
@@ -74,11 +84,13 @@ services:
     depends_on:
       - postgresql
       - liquibase-migrations
+      - auth-service
       - kafka
     build: tariffs/.
     environment:
       - spring_datasource_url=jdbc:postgresql://postgresql:5432/client_db
-      - products_client_base_url=http://localhost:8081/api/products
+      - products_client_base_url=http://products-service:8081
+      - auth_client_base_url=http://auth-service:8079
       - spring_kafka_bootstrap_servers=kafka:29092
     #    ports:
     #      - "8082:8082"
@@ -90,11 +102,13 @@ services:
       - tariffs-service
       - postgresql
       - liquibase-migrations
+      - auth-service
       - kafka
     build: products/.
     environment:
-      - tariffs_client_base_url=http://tariffs-service:8082/api/tariffs
       - spring_datasource_url=jdbc:postgresql://postgresql:5432/client_db
+      - tariffs_client_base_url=http://tariffs-service:8082
+      - auth_client_base_url=http://auth-service:8079
       - spring_kafka_bootstrap_servers=kafka:29092
     #    ports:
     #      - "8081:8081"
@@ -106,10 +120,12 @@ services:
       - products-service
       - tariffs-service
       - users-service
+      - auth-service
     build: backend-client-service/.
     environment:
-      - products_client_base_url=http://products-service:8081/api/products
-      - tariffs_client_base_url=http://tariffs-service:8082/api/tariffs
+      - products_client_base_url=http://products-service:8081
+      - tariffs_client_base_url=http://tariffs-service:8082
+      - auth_client_base_url=http://auth-service:8079
     ports:
       - "8083:8083"
     networks:

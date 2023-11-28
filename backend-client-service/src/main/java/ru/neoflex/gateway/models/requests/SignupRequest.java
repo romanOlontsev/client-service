@@ -1,4 +1,4 @@
-package ru.neoflex.auth.models.requests;
+package ru.neoflex.gateway.models.requests;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class SigninRequest {
+public class SignupRequest {
 
     @JsonProperty(value = "login")
     private String login;

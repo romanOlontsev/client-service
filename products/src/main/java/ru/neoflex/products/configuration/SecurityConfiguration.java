@@ -24,7 +24,7 @@ public class SecurityConfiguration {
             .cors(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(request -> request.requestMatchers("/api/products/**")
                                                      .authenticated()
-//TODO DELETE
+
                                                      .requestMatchers("/swagger-ui/**")
                                                      .permitAll()
                                                      .requestMatchers("/v3/api-docs/**")

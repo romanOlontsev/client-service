@@ -42,7 +42,6 @@ public class SecurityConfiguration {
                                                      .requestMatchers("/admin/addresses/**")
                                                      .authenticated()
 
-//TODO DELETE
                                                      .requestMatchers("/swagger-ui/**")
                                                      .permitAll()
                                                      .requestMatchers("/v3/api-docs/**")

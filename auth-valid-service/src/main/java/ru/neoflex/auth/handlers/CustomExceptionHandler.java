@@ -14,18 +14,6 @@ import ru.neoflex.auth.models.responses.ApiErrorResponse;
 @Slf4j
 @RestControllerAdvice
 public class CustomExceptionHandler {
-//        extends ResponseEntityExceptionHandler {
-
-//    @Override
-//    protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
-//        String message = ex.getFieldErrors()
-//                           .stream()
-//                           .map(it -> it.getField() + ": " + it.getDefaultMessage())
-//                           .collect(Collectors.joining("; "));
-//        ApiErrorResponse apiErrorResponse = getApiErrorResponse(ex, "400", message);
-//        log.error(message);
-//        return new ResponseEntity<>(apiErrorResponse, status);
-//    }
 
     @ExceptionHandler(BadRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)

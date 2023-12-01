@@ -31,9 +31,6 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
-//    @Column(name = "account_id")
-//    private Long accountId;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return new HashSet<>();

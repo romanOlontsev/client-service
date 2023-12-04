@@ -1,5 +1,6 @@
 package ru.neoflex.products.controllers.impls;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import ru.neoflex.products.controllers.ProductController;
@@ -22,23 +23,23 @@ public class ProductControllerImpl implements ProductController {
     }
 
     @Override
-    public ProductResponse getCurrentVersionOfProductById(String id) {
-        return service.getCurrentVersionOfProductById(id);
+    public ProductResponse getCurrentVersionOfProductById(HttpServletRequest httpRequest, String id) {
+        return service.getCurrentVersionOfProductById(httpRequest, id);
     }
 
     @Override
-    public List<ProductResponse> getPreviousVersionsOfProductById(String id) {
-        return service.getPreviousVersionsOfProductById(id);
+    public List<ProductResponse> getPreviousVersionsOfProductById(HttpServletRequest httpRequest, String id) {
+        return service.getPreviousVersionsOfProductById(httpRequest, id);
     }
 
     @Override
-    public ProductResponse getVersionsOfProductForCertainPeriodById(String id, LocalDateTime dateTime) {
-        return service.getVersionOfProductForCertainPeriodById(id, dateTime);
+    public ProductResponse getVersionsOfProductForCertainPeriodById(HttpServletRequest httpRequest, String id, LocalDateTime dateTime) {
+        return service.getVersionOfProductForCertainPeriodById(httpRequest, id, dateTime);
     }
 
     @Override
-    public void createProduct(ProductRequest request) {
-        service.createProduct(request);
+    public void createProduct(HttpServletRequest httpRequest, ProductRequest productRequest) {
+        service.createProduct(httpRequest, productRequest);
     }
 
     @Override
@@ -47,8 +48,8 @@ public class ProductControllerImpl implements ProductController {
     }
 
     @Override
-    public void updateProduct(String id, ProductRequest request) {
-        service.updateProduct(id, request);
+    public void updateProduct(HttpServletRequest httpRequest, String id, ProductRequest request) {
+        service.updateProduct(httpRequest, id, request);
     }
 
     @Override

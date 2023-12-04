@@ -13,11 +13,11 @@ public class OpenApiConfiguration {
     public OpenAPI openApi() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("Users API")
-                        .version("0.0.1-SNAPSHOT")
-                        .contact(new Contact()
-                                .name("Roman Olontsev")
-                                .email("rolontsev@neoflex.ru")
-                                .url("https://t.me/r_olontsev")));
+                              .title("Users API")
+                              .version("0.0.1-SNAPSHOT")
+                              .contact(new Contact()
+                                               .name("Roman Olontsev")
+                                               .email("rolontsev@neoflex.ru")
+                                               .url("https://t.me/r_olontsev")));
     }
 }

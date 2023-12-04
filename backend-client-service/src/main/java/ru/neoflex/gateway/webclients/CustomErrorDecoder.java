@@ -38,7 +38,7 @@ public class CustomErrorDecoder implements ErrorDecoder {
             String result = getResponseBodyAsString(response.body());
             objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
             ApiErrorResponse exceptionMessage = objectMapper.readValue(result,
-                    ApiErrorResponse.class);
+                                                                       ApiErrorResponse.class);
             message = exceptionMessage.getDescription();
         } catch (IOException e) {
             log.error("Failed to get body as reader: ", e);

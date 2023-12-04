@@ -13,28 +13,42 @@ import java.util.List;
 @FeignClient(value = "products", url = "${products.client.base-url}", configuration = CustomErrorDecoder.class)
 public interface ProductClient {
 
-    @GetMapping(value = "/{id}/current", produces = MediaType.APPLICATION_JSON_VALUE)
-    ProductResponse getCurrentVersionOfProductById(@PathVariable(value = "id") String id);
+    @GetMapping(value = "/api/products/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    ProductResponse getCurrentVersionOfProductById(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(value = "id") String id);
 
-    @GetMapping(value = "/{id}/previous", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<ProductResponse> getPreviousVersionsOfProductById(@PathVariable(value = "id") String id);
+    @GetMapping(value = "/api/products/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
+    List<ProductResponse> getPreviousVersionsOfProductById(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(value = "id") String id);
 
-    @GetMapping(value = "/{id}/period", produces = MediaType.APPLICATION_JSON_VALUE)
-    ProductResponse getVersionsOfProductForCertainPeriodById(@PathVariable(value = "id") String id,
-                                                             @RequestParam(value = "datetime")
-                                                             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-                                                             LocalDateTime dateTime);
+    @GetMapping(value = "/api/products/{id}/versions/period", produces = MediaType.APPLICATION_JSON_VALUE)
+    ProductResponse getVersionsOfProductForCertainPeriodById(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(value = "id") String id,
+            @RequestParam(value = "datetime")
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+            LocalDateTime dateTime);
 
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
-    void createProduct(@RequestBody ProductRequest request);
+    @PostMapping(value = "/api/products", consumes = MediaType.APPLICATION_JSON_VALUE)
+    void createProduct(
+            @RequestHeader("Authorization") String token,
+            @RequestBody ProductRequest request);
 
-    @PutMapping(value = "/{id}/rollback")
-    void rollBackProductVersion(@PathVariable(value = "id") String id);
+    @PutMapping(value = "/api/products/{id}/rollback")
+    void rollBackProductVersion(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(value = "id") String id);
 
-    @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    void updateProduct(@PathVariable(value = "id") String id, @RequestBody ProductRequest request);
+    @PatchMapping(value = "/api/products/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    void updateProduct(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(value = "id") String id, @RequestBody ProductRequest request);
 
-    @DeleteMapping("/{id}")
-    void deleteProduct(@PathVariable(value = "id") String id);
+    @DeleteMapping("/api/products/{id}")
+    void deleteProduct(
+            @RequestHeader("Authorization") String token,
+            @PathVariable(value = "id") String id);
 
 }

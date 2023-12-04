@@ -1,4 +1,4 @@
-package ru.neoflex.tariffs.webclient;
+package ru.neoflex.tariffs.webclients;
 
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
@@ -8,9 +8,9 @@ import ru.neoflex.tariffs.models.responses.ProductResponse;
 
 import java.util.List;
 
-@FeignClient(value = "products", url = "${products.client.base-url}")
+@FeignClient(value = "products", url = "${products.client.base-url}", configuration = CustomErrorDecoder.class)
 public interface ProductClient {
 
-    @GetMapping(value = "/api/products",produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/products", produces = MediaType.APPLICATION_JSON_VALUE)
     List<ProductResponse> getProductsByTariffId(@RequestParam(value = "tariff") String tariffId);
 }

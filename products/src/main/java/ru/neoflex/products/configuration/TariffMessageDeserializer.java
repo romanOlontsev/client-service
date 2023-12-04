@@ -7,12 +7,12 @@ import ru.neoflex.products.models.requests.TariffMessage;
 
 import java.nio.charset.StandardCharsets;
 
-public class TariffMessageDeserializer implements Deserializer<TariffMessage>{
+public class TariffMessageDeserializer implements Deserializer<TariffMessage> {
 
     @Override
     public TariffMessage deserialize(String s, byte[] bytes) {
         try {
-            if (bytes == null){
+            if (bytes == null) {
                 return null;
             }
             ObjectMapper objectMapper = new ObjectMapper();

@@ -1,5 +1,6 @@
 package ru.neoflex.gateway.controllers.impls;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.RestController;
@@ -19,38 +20,38 @@ public class ProductGatewayControllerImpl implements ProductGatewayController {
     private final ProductGatewayService service;
 
     @Override
-    public ProductResponse getCurrentVersionOfProductById(String id) {
-        return service.getCurrentVersionOfProductById(id);
+    public ProductResponse getCurrentVersionOfProductById(HttpServletRequest httpRequest, String id) {
+        return service.getCurrentVersionOfProductById(httpRequest, id);
     }
 
     @Override
-    public List<ProductResponse> getPreviousVersionsOfProductById(String id) {
-        return service.getPreviousVersionsOfProductById(id);
+    public List<ProductResponse> getPreviousVersionsOfProductById(HttpServletRequest httpRequest, String id) {
+        return service.getPreviousVersionsOfProductById(httpRequest, id);
     }
 
     @Override
-    public ProductResponse getVersionsOfProductForCertainPeriodById(String id, LocalDateTime dateTime) {
-        return service.getVersionOfProductForCertainPeriodById(id, dateTime);
+    public ProductResponse getVersionsOfProductForCertainPeriodById(HttpServletRequest httpRequest, String id, LocalDateTime dateTime) {
+        return service.getVersionOfProductForCertainPeriodById(httpRequest, id, dateTime);
     }
 
     @Override
-    public void createProduct(ProductRequest request) {
-        service.createProduct(request);
+    public void createProduct(HttpServletRequest httpRequest, ProductRequest request) {
+        service.createProduct(httpRequest, request);
     }
 
     @Override
-    public void rollBackProductVersion(String id) {
-        service.rollBackProductVersionById(id);
+    public void rollBackProductVersion(HttpServletRequest httpRequest, String id) {
+        service.rollBackProductVersionById(httpRequest, id);
     }
 
     @Override
-    public void updateProduct(String id, ProductRequest request) {
-        service.updateProduct(id, request);
+    public void updateProduct(HttpServletRequest httpRequest, String id, ProductRequest request) {
+        service.updateProduct(httpRequest, id, request);
     }
 
     @Override
-    public void deleteProduct(String id) {
-        service.deleteProductById(id);
+    public void deleteProduct(HttpServletRequest httpRequest, String id) {
+        service.deleteProductById(httpRequest, id);
     }
 
 }

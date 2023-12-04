@@ -8,6 +8,8 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -18,7 +20,8 @@ import ru.neoflex.gateway.models.responses.TariffResponse;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tariff")
+@SecurityRequirement(name = "Bearer Authentication")
+@RequestMapping("/api/tariffs")
 @Validated
 public interface TariffGatewayController {
 
@@ -43,6 +46,7 @@ public interface TariffGatewayController {
     })
     @GetMapping(value = "/{id}/versions/current", produces = MediaType.APPLICATION_JSON_VALUE)
     TariffResponse getCurrentVersionOfTariffById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
@@ -69,6 +73,7 @@ public interface TariffGatewayController {
     })
     @GetMapping(value = "{id}/versions/{version}", produces = MediaType.APPLICATION_JSON_VALUE)
     TariffResponse getTariffByIdAndVersion(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id,
@@ -99,6 +104,7 @@ public interface TariffGatewayController {
     })
     @GetMapping(value = "/{id}/versions/previous", produces = MediaType.APPLICATION_JSON_VALUE)
     List<TariffResponse> getPreviousVersionsOfTariffById(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);
@@ -120,6 +126,7 @@ public interface TariffGatewayController {
     })
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     void createTariff(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.DEFAULT,
                     schema = @Schema(implementation = TariffRequest.class))
             @RequestBody TariffRequest request);
@@ -142,6 +149,7 @@ public interface TariffGatewayController {
     })
     @PatchMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     void updateTariff(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id,
@@ -166,6 +174,7 @@ public interface TariffGatewayController {
     })
     @DeleteMapping("/{id}")
     void deleteTariff(
+            HttpServletRequest httpRequest,
             @Parameter(in = ParameterIn.PATH,
                     required = true)
             @PathVariable(value = "id") String id);

@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.WireMockServer;
 import com.maciejwalkowiak.wiremock.spring.ConfigureWireMock;
 import com.maciejwalkowiak.wiremock.spring.EnableWireMock;
 import com.maciejwalkowiak.wiremock.spring.InjectWireMock;
+import jakarta.servlet.http.HttpServletRequest;
 import liquibase.Contexts;
 import liquibase.LabelExpression;
 import liquibase.Liquibase;
@@ -14,6 +15,7 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.DirectoryResourceAccessor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -71,10 +73,10 @@ class ProductServiceTest extends IntegrationEnvironment {
              Database database = DatabaseFactory.getInstance()
                                                 .findCorrectDatabaseImplementation(new JdbcConnection(connection))) {
             Liquibase liquibase = new liquibase.Liquibase("master.xml",
-                    new DirectoryResourceAccessor(new File("").toPath()
-                                                              .toAbsolutePath()
-                                                              .getParent()
-                                                              .resolve("migrations")), database
+                                                          new DirectoryResourceAccessor(new File("").toPath()
+                                                                                                    .toAbsolutePath()
+                                                                                                    .getParent()
+                                                                                                    .resolve("migrations")), database
             );
             liquibase.update(new Contexts(), new LabelExpression());
         } catch (LiquibaseException | SQLException | FileNotFoundException e) {
@@ -113,7 +115,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                                           .hasSize(1)
                                           .isEqualTo(expectedList)
 
-        );
+                 );
 
     }
 
@@ -140,27 +142,29 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                   .tariff(tariffResponse)
                                                   .productVersion(2L)
                                                   .build();
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
 
         TariffsMocks.setupMockResponseForCurrentVersion(wiremock, tariffId, "payload/tariff_response.json");
-        ProductResponse response = service.getCurrentVersionOfProductById(productId);
+        ProductResponse response = service.getCurrentVersionOfProductById(httpRequestMock, productId);
 
         assertAll(
                 () -> assertThat(response).isNotNull()
                                           .isEqualTo(expected)
 
-        );
+                 );
     }
 
     @Test
     void getCurrentVersionOfProductById_shouldThrowDataNotFoundException() {
         String productId = UUID.randomUUID()
                                .toString();
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
 
         assertAll(
-                () -> assertThatThrownBy(() -> service.getCurrentVersionOfProductById(productId))
+                () -> assertThatThrownBy(() -> service.getCurrentVersionOfProductById(httpRequestMock, productId))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Product with id=%s not found", productId))
-        );
+                 );
     }
 
     @Test
@@ -186,11 +190,12 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                   .tariff(tariffResponse)
                                                   .productVersion(1L)
                                                   .build();
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
         List<ProductResponse> expectedList = List.of(expected);
 
         TariffsMocks.setupMockResponseByVersion(wiremock, tariffId, tariffResponse.getVersion()
                                                                                   .toString(), "payload/tariff_response_by_version.json");
-        List<ProductResponse> response = service.getPreviousVersionsOfProductById(productId);
+        List<ProductResponse> response = service.getPreviousVersionsOfProductById(httpRequestMock, productId);
 
         assertAll(
                 () -> assertThat(response).isNotNull()
@@ -198,7 +203,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                                           .hasSize(1)
                                           .isEqualTo(expectedList)
 
-        );
+                 );
     }
 
     @Test
@@ -224,18 +229,18 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                   .tariff(tariffResponse)
                                                   .productVersion(1L)
                                                   .build();
-
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
         TariffsMocks.setupMockResponseByVersion(wiremock, tariffId, tariffResponse.getVersion()
                                                                                   .toString(), "payload/tariff_response_by_version.json");
 
         LocalDateTime localDateTime = LocalDateTime.of(2023, 10, 30, 12, 41, 0);
-        ProductResponse response = service.getVersionOfProductForCertainPeriodById(productId, localDateTime);
+        ProductResponse response = service.getVersionOfProductForCertainPeriodById(httpRequestMock, productId, localDateTime);
 
         assertAll(
                 () -> assertThat(response).isNotNull()
                                           .isEqualTo(expected)
 
-        );
+                 );
     }
 
     @Test
@@ -243,12 +248,13 @@ class ProductServiceTest extends IntegrationEnvironment {
         String productId = UUID.randomUUID()
                                .toString();
         LocalDateTime localDateTime = LocalDateTime.of(2000, 9, 30, 21, 41, 0);
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
 
         assertAll(
-                () -> assertThatThrownBy(() -> service.getVersionOfProductForCertainPeriodById(productId, localDateTime))
+                () -> assertThatThrownBy(() -> service.getVersionOfProductForCertainPeriodById(httpRequestMock, productId, localDateTime))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Version for product with id=%s for period %s not found", productId, localDateTime))
-        );
+                 );
     }
 
     @Test
@@ -259,10 +265,10 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                .type("CARD")
                                                .tariff(UUID.fromString(tariffId))
                                                .build();
-
         TariffsMocks.setupMockResponseForCurrentVersion(wiremock, tariffId, "payload/tariff_response.json");
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
 
-        service.createProduct(request);
+        service.createProduct(httpRequestMock, request);
         List<Product> allTariffs = repository.findAll();
 
         assertAll(
@@ -272,7 +278,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                    .isEqualTo(request.getName()),
                 () -> assertThat(allTariffs.get(2)).extracting(Product::getType)
                                                    .isEqualTo(request.getType())
-        );
+                 );
     }
 
     @Test
@@ -282,7 +288,8 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                .name("GUS")
                                                .description("test")
                                                .build();
-        service.updateProduct(productId, updated);
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
+        service.updateProduct(httpRequestMock, productId, updated);
 
         service.rollBackProductVersionById(productId);
         List<Product> response = repository.findAll();
@@ -303,7 +310,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThat(foundProduct).isNotNull()
                                               .extracting(Product::getTariffVersion)
                                               .isNotEqualTo(updated.getDescription())
-        );
+                 );
     }
 
     @Test
@@ -314,7 +321,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThatThrownBy(() -> service.rollBackProductVersionById(productId))
                         .isInstanceOf(DataNotFoundException.class)
                         .hasMessage(String.format("Previous version for product with id=%s not found", productId))
-        );
+                 );
     }
 
     @Test
@@ -327,9 +334,10 @@ class ProductServiceTest extends IntegrationEnvironment {
                                                .tariff(UUID.fromString(tariffId))
                                                .build();
 
+        HttpServletRequest httpRequestMock = Mockito.mock(HttpServletRequest.class);
         TariffsMocks.setupMockResponseForCurrentVersion(wiremock, tariffId, "payload/update_tariff_response.json");
 
-        service.updateProduct(productId, updated);
+        service.updateProduct(httpRequestMock, productId, updated);
         List<Product> response = repository.findAll();
         Product foundProduct = response.stream()
                                        .filter(it -> it.getId()
@@ -351,7 +359,7 @@ class ProductServiceTest extends IntegrationEnvironment {
                 () -> assertThat(foundProduct).isNotNull()
                                               .extracting(Product::getTariff)
                                               .isEqualTo(updated.getTariff())
-        );
+                 );
     }
 
     @Test
@@ -367,6 +375,6 @@ class ProductServiceTest extends IntegrationEnvironment {
                                           .hasSize(1),
                 () -> assertThat(response.get(0)).extracting(Product::getId)
                                                  .isNotEqualTo(UUID.fromString(productId))
-        );
+                 );
     }
 }

@@ -10,6 +10,11 @@
     <include file="users-schema.sql"/>
     <include file="tariffs-schema.sql"/>
     <include file="products-schema.sql"/>
+    <include file="accounts-schema.sql"/>
+    <include file="valid-addresses-schema.sql"/>
+    <include file="users-insert.sql"/>
     <include file="tariffs-insert.sql"/>
     <include file="products-insert.sql"/>
+
+    <include file="valid-addresses-import.sql"/>
 </databaseChangeLog>

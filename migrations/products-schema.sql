@@ -4,13 +4,13 @@
 create schema if not exists products_app;
 create table if not exists products_app.product
 (
-    id              uuid not null primary key,
-    name            varchar(255) not null,
+    id              uuid                                              not null primary key,
+    name            varchar(255)                                      not null,
     type            varchar(4) check (type = 'LOAN' or type = 'CARD') not null,
     start_date      timestamp(6),
     end_date        timestamp(6),
     description     text,
-    tariff          uuid not null,
+    tariff          uuid                                              not null,
     author          uuid,
     product_version bigint,
     tariff_version  bigint
@@ -22,16 +22,16 @@ create table if not exists products_app.revinfo
 );
 create table if not exists products_app.product_aud
 (
-    id          uuid    not null,
-    rev         integer not null,
-    revtype     smallint,
-    name        varchar(255),
-    type        varchar(4),
-    start_date  timestamp(6),
-    end_date    timestamp(6),
-    description text,
-    tariff      uuid,
-    author      uuid,
+    id              uuid    not null,
+    rev             integer not null,
+    revtype         smallint,
+    name            varchar(255),
+    type            varchar(4),
+    start_date      timestamp(6),
+    end_date        timestamp(6),
+    description     text,
+    tariff          uuid,
+    author          uuid,
     product_version bigint,
     tariff_version  bigint,
     primary key (rev, id),

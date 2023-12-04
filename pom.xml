@@ -21,6 +21,7 @@
         <module>products</module>
         <module>tariffs</module>
         <module>backend-client-service</module>
+        <module>auth-valid-service</module>
     </modules>
 
     <properties>
@@ -33,6 +34,7 @@
         <spring-cloud-dependencies.version>2022.0.4</spring-cloud-dependencies.version>
         <wiremock.version>3.0.1</wiremock.version>
         <wiremock-spring-boot.version>2.0.0</wiremock-spring-boot.version>
+        <jjwt-api.version>0.11.5</jjwt-api.version>
     </properties>
 
     <dependencyManagement>
@@ -50,6 +52,41 @@
                 <version>${testcontainers.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate</groupId>
+                <artifactId>hibernate-envers</artifactId>
+                <version>${hibernate.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.yaml</groupId>
+                <artifactId>snakeyaml</artifactId>
+                <version>${snakeyaml.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc-openapi-starter-webmvc-ui.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${mapstruct.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

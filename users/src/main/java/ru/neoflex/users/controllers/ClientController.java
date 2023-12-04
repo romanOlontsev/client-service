@@ -115,5 +115,5 @@ public interface ClientController {
             @RequestParam(value = "phonenumber", required = false) String phoneNumber,
             @Parameter(in = ParameterIn.QUERY)
             @RequestParam(value = "email", required = false) String email
-    );
+                                                    );
 }

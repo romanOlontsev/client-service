@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-    <property name="LOGS" value="var/log/users"/>
+    <property name="LOGS" value="var/log/account"/>
     <appender name="Console"
               class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -11,13 +11,13 @@
     </appender>
     <appender name="RollingFile"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOGS}/users.log</file>
+        <file>${LOGS}/accounts.log</file>
         <encoder
                 class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <pattern>%d %p %c{1} [%t] %m%n</pattern>
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>${LOGS}/archived/users-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
+            <fileNamePattern>${LOGS}/archived/account-%d{yyyy-MM-dd}-%i.log</fileNamePattern>
             <maxFileSize>10MB</maxFileSize>
             <totalSizeCap>1GB</totalSizeCap>
             <maxHistory>60</maxHistory>

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tariffs")
+@SecurityRequirement(name = "Bearer Authentication")
 @Validated
 public interface TariffsController {
 
@@ -31,6 +33,10 @@ public interface TariffsController {
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = TariffResponse.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -56,6 +62,10 @@ public interface TariffsController {
                             mediaType = MediaType.APPLICATION_JSON_VALUE,
                             schema = @Schema(implementation = TariffResponse.class)
                     )
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
             ),
             @ApiResponse(
                     responseCode = "404",
@@ -88,6 +98,10 @@ public interface TariffsController {
                     )
             ),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "The tariff not found",
                     content = @Content(
@@ -108,6 +122,10 @@ public interface TariffsController {
             @ApiResponse(
                     responseCode = "200",
                     description = "The tariff was created successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
             ),
             @ApiResponse(
                     responseCode = "400",
@@ -132,6 +150,10 @@ public interface TariffsController {
                     description = "Update successful"
             ),
             @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
+            ),
+            @ApiResponse(
                     responseCode = "404",
                     description = "The tariff not found",
                     content = @Content(
@@ -154,6 +176,10 @@ public interface TariffsController {
             @ApiResponse(
                     responseCode = "200",
                     description = "The tariff was deleted successfully"
+            ),
+            @ApiResponse(
+                    responseCode = "403",
+                    description = "Forbidden"
             ),
             @ApiResponse(
                     responseCode = "404",
